@@ -13,7 +13,7 @@
 
 EXE = build/app
 IMGUI_DIR = imgui-boilerplate/imgui
-SOURCES = main.cpp imgui-boilerplate/window.cpp
+SOURCES = main.cpp dockspace.cpp editor.cpp imgui-boilerplate/window.cpp
 SOURCES += $(IMGUI_DIR)/imgui.cpp $(IMGUI_DIR)/imgui_demo.cpp
 SOURCES += $(IMGUI_DIR)/imgui_draw.cpp $(IMGUI_DIR)/imgui_tables.cpp
 SOURCES += $(IMGUI_DIR)/imgui_widgets.cpp
