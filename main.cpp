@@ -4,8 +4,12 @@
 void render_editor() {
 
     ImGui::Begin("Editor");
-    // Note: we are using a fixed-sized buffer for simplicity here. See ImGuiInputTextFlags_CallbackResize
-    // and the code in misc/cpp/imgui_stdlib.h for how to setup InputText() for dynamically resizing strings.
+
+    // Note: we are using a fixed-sized buffer for simplicity here. See
+    // ImGuiInputTextFlags_CallbackResize and the code in
+    // misc/cpp/imgui_stdlib.h for how to setup InputText() for dynamically
+    // resizing strings.
+
     static char text[1024 * 16] =
         "/*\n"
         " The Pentium F00F bug, shorthand for F0 0F C7 C8,\n"
@@ -19,10 +23,14 @@ void render_editor() {
         "\tlock cmpxchg8b eax\n";
 
     static ImGuiInputTextFlags flags = ImGuiInputTextFlags_AllowTabInput;
-    ImGui::CheckboxFlags("ImGuiInputTextFlags_ReadOnly", &flags, ImGuiInputTextFlags_ReadOnly);
-    ImGui::CheckboxFlags("ImGuiInputTextFlags_AllowTabInput", &flags, ImGuiInputTextFlags_AllowTabInput);
-    ImGui::CheckboxFlags("ImGuiInputTextFlags_CtrlEnterForNewLine", &flags, ImGuiInputTextFlags_CtrlEnterForNewLine);
-    ImGui::InputTextMultiline("##source", text, IM_ARRAYSIZE(text), ImVec2(-FLT_MIN, ImGui::GetTextLineHeight() * 16), flags);
+    ImGui::CheckboxFlags("ImGuiInputTextFlags_ReadOnly",
+            &flags, ImGuiInputTextFlags_ReadOnly);
+    ImGui::CheckboxFlags("ImGuiInputTextFlags_AllowTabInput",
+            &flags, ImGuiInputTextFlags_AllowTabInput);
+    ImGui::CheckboxFlags("ImGuiInputTextFlags_CtrlEnterForNewLine",
+            &flags, ImGuiInputTextFlags_CtrlEnterForNewLine);
+    ImGui::InputTextMultiline("##source", text, IM_ARRAYSIZE(text),
+            ImVec2(-FLT_MIN, ImGui::GetTextLineHeight() * 16), flags);
     ImGui::End();
 }
 
@@ -36,6 +44,7 @@ void render_dockspace() {
     // We are using the ImGuiWindowFlags_NoDocking flag to make the parent
     // window not dockable into, because it would be confusing to have two
     // docking targets within each others.
+
     ImGuiWindowFlags window_flags = ImGuiWindowFlags_MenuBar |
                                     ImGuiWindowFlags_NoDocking;
     if (opt_fullscreen)
@@ -46,8 +55,11 @@ void render_dockspace() {
         ImGui::SetNextWindowViewport(viewport->ID);
         ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
         ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
-        window_flags |= ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove;
-        window_flags |= ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoNavFocus;
+        window_flags |= ImGuiWindowFlags_NoTitleBar |
+            ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize |
+            ImGuiWindowFlags_NoMove;
+        window_flags |= ImGuiWindowFlags_NoBringToFrontOnFocus |
+            ImGuiWindowFlags_NoNavFocus;
     }
     else
     {
@@ -71,7 +83,9 @@ void render_dockspace() {
     if (!opt_padding) {
         ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
     }
+
     ImGui::Begin("DockSpace Demo", &p_open, window_flags);
+
     if (!opt_padding) {
         ImGui::PopStyleVar();
     }
