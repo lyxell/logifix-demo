@@ -1,3 +1,6 @@
 [submodule "imgui-boilerplate"]
 	path = imgui-boilerplate
 	url = https://github.com/lyxell/imgui-boilerplate.git
+[submodule "sjp"]
+	path = sjp
+	url = https://github.com/lyxell/sjp.git
