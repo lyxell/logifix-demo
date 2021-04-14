@@ -1,0 +1,3 @@
+[submodule "imgui-boilerplate"]
+	path = imgui-boilerplate
+	url = https://github.com/lyxell/imgui-boilerplate.git
