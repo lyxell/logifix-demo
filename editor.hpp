@@ -1,17 +1,20 @@
 #pragma once
 
-#include <cstring>
+#include <vector>
+#include <string>
+#include <queue>
+#include <SDL.h>
+
+struct cursor_t {
+    int x;
+    int y;
+};
 
 class editor {
+    void handle_keypress(std::queue<SDL_Keycode>& input);
 public:
-    char text[1024 * 16];
-    void render();
-    editor() {
-        std::strcpy(text,
-            "public class Main {\n"
-            "   public static void main(String[] args) {\n"
-            "       System.out.println();\n"
-            "   }\n"
-            "}");
-    }
+    std::vector<std::string> lines;
+    cursor_t cursor;
+    void render(std::queue<SDL_Keycode>& input);
+    editor();
 };
