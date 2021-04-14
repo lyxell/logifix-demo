@@ -3,8 +3,8 @@
 #include <cstring>
 
 class editor {
-    char text[1024 * 16];
 public:
+    char text[1024 * 16];
     void render();
     editor() {
         std::strcpy(text,
