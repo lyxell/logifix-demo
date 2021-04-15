@@ -16,5 +16,6 @@ public:
     std::vector<std::string> lines;
     cursor_t cursor;
     void render(std::queue<SDL_Keycode>& input);
+    size_t get_buffer_position();
     editor();
 };

@@ -2,17 +2,25 @@
 #include "imgui.h"
 #include <cstdlib>
 
+
 editor::editor() {
     lines = {
         "public class Main {",
         "    public static void main(String[] args) {",
         "       System.out.println();",
         "   }",
-        "}",
-        "MMXX"
+        "}"
     };
     cursor.x = 0;
     cursor.y = 0;
+}
+
+size_t editor::get_buffer_position() {
+    size_t result = 0;
+    for (int i = 0; i < cursor.y; i++)
+        result += lines[i].size() + 1; // 1 extra for newline
+    result += cursor.x;
+    return result;
 }
 
 void editor::handle_keypress(std::queue<SDL_Keycode>& input) {
@@ -25,11 +33,28 @@ void editor::handle_keypress(std::queue<SDL_Keycode>& input) {
                 case SDLK_DOWN:
                     cursor.y = std::min(int(lines.size()) - 1, cursor.y + 1);
                     break;
+                case SDLK_BACKSPACE:
+                    cursor.x = std::min(cursor.x, int(lines[cursor.y].size()));
+                    if (cursor.x > 0) {
+                        auto line = lines[cursor.y];
+                        lines[cursor.y] = line.substr(0, cursor.x - 1) +
+                                          line.substr(cursor.x);
+                        cursor.x--;
+                    }
+                    break;
                 case SDLK_RIGHT:
                     cursor.x = std::min(int(lines[cursor.y].size()), cursor.x + 1);
                     break;
                 case SDLK_LEFT:
+                    cursor.x = std::min(cursor.x, int(lines[cursor.y].size()));
                     cursor.x = std::max(0, cursor.x - 1);
+                    break;
+                // not sure how portable these are
+                case SDLK_SPACE ... SDLK_AT:
+                case SDLK_a ... SDLK_z:
+                    cursor.x = std::min(cursor.x, int(lines[cursor.y].size()));
+                    lines[cursor.y].insert(cursor.x, 1, (char) input.front());
+                    cursor.x++;
                     break;
             }
             input.pop();

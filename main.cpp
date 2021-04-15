@@ -8,7 +8,7 @@ class parser_state {
     bool running = false;
     std::vector<std::string> data;
 public:
-    size_t num_asts;
+    int num_asts;
     parser_state() {}
     void parse() {
         sjp::parser parser;
@@ -39,10 +39,12 @@ int main() {
         ps.update(ed.lines);
         ds.render();
         ed.render(window::keyboard_input);
-        ImGui::Begin("Number of ASTs");
-        ImGui::Text(std::to_string(ps.num_asts).c_str());
+        ImGui::Begin("Data");
+        ImGui::Text("Num ASTs:   %d", ps.num_asts);
+        ImGui::Text("Cursor:     (%d,%d)", ed.cursor.x, ed.cursor.y);
+        ImGui::Text("Buffer pos: %d", ed.get_buffer_position());
         ImGui::End();
-        ImGui::ShowDemoWindow(&show_demo_window);
+        //ImGui::ShowDemoWindow(&show_demo_window);
         window::end_frame();
     }
     window::destroy();
