@@ -40,6 +40,11 @@ void editor::handle_keypress(std::queue<SDL_Keycode>& input) {
                         lines[cursor.y] = line.substr(0, cursor.x - 1) +
                                           line.substr(cursor.x);
                         cursor.x--;
+                    } else if (cursor.y > 0) {
+                       cursor.x = lines[cursor.y - 1].size();
+                       lines[cursor.y - 1] += lines[cursor.y];
+                       lines.erase(lines.begin() + cursor.y);
+                       cursor.y--;
                     }
                     break;
                 case SDLK_RIGHT:
@@ -48,6 +53,12 @@ void editor::handle_keypress(std::queue<SDL_Keycode>& input) {
                 case SDLK_LEFT:
                     cursor.x = std::min(cursor.x, int(lines[cursor.y].size()));
                     cursor.x = std::max(0, cursor.x - 1);
+                    break;
+                case SDLK_RETURN:
+                    lines.insert(lines.begin() + cursor.y + 1, lines[cursor.y].substr(cursor.x));
+                    lines[cursor.y] = lines[cursor.y].substr(0, cursor.x);
+                    cursor.y++;
+                    cursor.x = 0;
                     break;
                 // not sure how portable these are
                 case SDLK_SPACE ... SDLK_AT:
