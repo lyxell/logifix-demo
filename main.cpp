@@ -3,12 +3,24 @@
 #include "dockspace.hpp"
 #include "editor.hpp"
 #include "build/sjp.hpp"
+#include <memory>
+
+using tuple = std::tuple<std::string,int,int>;
+
+struct tuple_tree {
+    tuple head;
+    std::vector<std::shared_ptr<tuple_tree>> children;
+};
+
+bool tuple_contains(tuple a, tuple b) {
+    return std::get<1>(a) <= std::get<1>(b) && std::get<2>(a) >= std::get<2>(b);
+}
 
 class parser_state {
     bool running = false;
     std::vector<std::string> data;
 public:
-    std::vector<std::tuple<std::string,int,int>> tuples;
+    std::shared_ptr<tuple_tree> tuples;
     int num_asts;
     parser_state() {}
     void parse() {
@@ -20,7 +32,24 @@ public:
         }
         parser.add_string("Example.java", output.c_str());
         parser.parse();
-        tuples = parser.get_tuples();
+        std::vector<tuple> ts = parser.get_tuples();
+        std::sort(ts.begin(), ts.end(), [](tuple a, tuple b){
+            return std::pair(std::get<1>(a), std::get<2>(b)) <
+                   std::pair(std::get<1>(b), std::get<2>(a));
+        });
+        std::vector<std::shared_ptr<tuple_tree>> stack;
+        tuples = nullptr;
+        if (ts.size()) {
+            tuples = std::make_shared<tuple_tree>(tuple_tree {ts[0]});
+            stack.push_back(tuples);
+        }
+        for (size_t i = 1; i < ts.size(); i++) {
+            while (!tuple_contains(stack.back()->head, ts[i])) stack.pop_back();
+            auto ref = std::make_shared<tuple_tree>(tuple_tree {ts[i]});
+            stack.back()->children.push_back(ref);
+            stack.push_back(ref);
+            
+        }
         num_asts = parser.num_asts();
     }
     void update(const std::vector<std::string>& u) {
@@ -31,6 +60,19 @@ public:
         }
     }
 };
+
+void render_tuple_tree(std::shared_ptr<tuple_tree> t) {
+    if (t) {
+        auto [tuple, children] = *t;
+        auto [sym, a, b] = tuple;
+        if (ImGui::TreeNodeEx(t.get(), ImGuiTreeNodeFlags_DefaultOpen, "%s %d %d", sym.c_str(), a, b)) {
+            for (auto child : children) {
+                render_tuple_tree(child);
+            }
+            ImGui::TreePop();
+        }
+    }
+}
 
 int main() {
     parser_state ps;
@@ -49,11 +91,9 @@ int main() {
         ImGui::Text("Buffer pos: %d", ed.get_buffer_position());
         ImGui::End();
         ImGui::Begin("Nodes");
-        for (auto [t, a, b] : ps.tuples) {
-            ImGui::Text("%s %d %d", t.c_str(), a, b);
-        }
+        render_tuple_tree(ps.tuples);
         ImGui::End();
-        //ImGui::ShowDemoWindow(&show_demo_window);
+        ImGui::ShowDemoWindow(&show_demo_window);
         window::end_frame();
     }
     window::destroy();

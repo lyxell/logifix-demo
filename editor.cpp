@@ -5,11 +5,18 @@
 
 editor::editor() {
     lines = {
+        "import java.util.ArrayList;",
+        "",
         "public class Main {",
         "    public static void main(String[] args) {",
         "       System.out.println();",
         "   }",
-        "}"
+        "}",
+        "public class Main {",
+        "    public static void main(String[] args) {",
+        "       System.out.println();",
+        "   }",
+        "}",
     };
     cursor.x = 0;
     cursor.y = 0;
