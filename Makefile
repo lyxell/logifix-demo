@@ -92,7 +92,7 @@ build/main.o: build/sjp.hpp
 
 build/parser.o: build/parser.cpp
 	@mkdir -p build
-	$(CXX) -O2 -std=c++17 -D__EMBEDDED_SOUFFLE__ -c -o $@ $<
+	$(CXX) -O0 -std=c++17 -D__EMBEDDED_SOUFFLE__ -c -o $@ $<
 
 build/%.o: %.cpp
 	@mkdir -p build

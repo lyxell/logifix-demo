@@ -158,7 +158,9 @@ int main() {
         ImGui::Text("Buffer pos: %d", ed.get_buffer_position());
         ImGui::End();
         ImGui::Begin("Nodes");
+        ImGui::Unindent();
         render_tuple_tree(ps.tuples, ed.get_buffer_position());
+        ImGui::Indent();
         ImGui::End();
         //ImGui::ShowDemoWindow(&show_demo_window);
         window::end_frame();
