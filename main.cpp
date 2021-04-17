@@ -79,6 +79,9 @@ void render_tuple_tree(std::shared_ptr<tuple_tree> t, size_t pos) {
 }
 
 void set_style() {
+
+    ImGuiIO& io = ImGui::GetIO(); (void)io;
+    io.Fonts->AddFontFromFileTTF("gohufont-ttf/gohufont-14.ttf", 14.0f);
     ImGuiStyle* style = &ImGui::GetStyle();
     style->TabRounding = 0.0f;
     style->WindowBorderSize = 0.0f;
