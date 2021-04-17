@@ -4,6 +4,3 @@
 [submodule "sjp"]
 	path = sjp
 	url = https://github.com/lyxell/sjp.git
-[submodule "gohufont-ttf"]
-	path = gohufont-ttf
-	url = https://github.com/koemaeda/gohufont-ttf.git

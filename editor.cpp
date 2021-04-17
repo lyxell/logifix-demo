@@ -97,7 +97,7 @@ void editor::render(std::queue<SDL_Keycode>& input) {
                 pos.x += ImGui::CalcTextSize(line.substr(0, cursor.x).c_str()).x;
                 ImVec2 vstart(pos.x, pos.y);
                 ImVec2 vend(pos.x + 1.0f, pos.y + ImGui::GetTextLineHeight());
-                drawList->AddRectFilled(vstart, vend, IM_COL32(255,255,255,255));
+                drawList->AddRectFilled(vstart, vend, IM_COL32(0,0,0,255));
             }
             ImGui::Text(line.c_str());
             row++;
