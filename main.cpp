@@ -2,7 +2,7 @@
 #include "imgui.h"
 #include "dockspace.hpp"
 #include "editor.hpp"
-#include "build/sjp.hpp"
+#include "sjp/sjp.hpp"
 #include <memory>
 
 using tuple = std::tuple<std::string,int,int>;

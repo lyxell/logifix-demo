@@ -13,7 +13,7 @@
 
 EXE = build/app
 IMGUI_DIR = imgui-boilerplate/imgui
-SOURCES = main.cpp dockspace.cpp editor.cpp imgui-boilerplate/window.cpp build/parser.cpp
+SOURCES = main.cpp dockspace.cpp editor.cpp imgui-boilerplate/window.cpp
 SOURCES += $(IMGUI_DIR)/imgui.cpp $(IMGUI_DIR)/imgui_demo.cpp
 SOURCES += $(IMGUI_DIR)/imgui_draw.cpp $(IMGUI_DIR)/imgui_tables.cpp
 SOURCES += $(IMGUI_DIR)/imgui_widgets.cpp
@@ -75,24 +75,8 @@ endif
 all: $(EXE)
 	@echo Build complete for $(ECHO_MESSAGE)
 
-$(EXE): $(OBJS)
+$(EXE): $(OBJS) sjp/sjp.o sjp/parser.o
 	$(CXX) -o $@ $^ $(CXXFLAGS) $(LIBS)
-
-build/sjp.hpp: sjp/sjp_re2c.hpp
-	re2c -W --input-encoding utf8 -i $< -o $@
-
-build/parser.cpp: sjp/parser.dl
-	souffle --no-warn \
-			--generate=$@ \
-			--fact-dir=build \
-			--output-dir=build \
-			$^
-
-build/main.o: build/sjp.hpp
-
-build/parser.o: build/parser.cpp
-	@mkdir -p build
-	$(CXX) -O0 -std=c++17 -D__EMBEDDED_SOUFFLE__ -c -o $@ $<
 
 build/%.o: %.cpp
 	@mkdir -p build
