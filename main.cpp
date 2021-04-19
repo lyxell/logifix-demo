@@ -85,7 +85,7 @@ void set_style() {
     ImGuiStyle* style = &ImGui::GetStyle();
     style->WindowMenuButtonPosition = -1;
     style->TabRounding = 0.0f;
-    style->WindowBorderSize = 0.0f;
+    style->WindowBorderSize = 1.0f;
     ImVec4* c = style->Colors;
     c[ImGuiCol_Text]                   = ImVec4(0.00f, 0.00f, 0.00f, 1.00f);
     c[ImGuiCol_TextDisabled]           = ImVec4(0.76f, 0.76f, 0.76f, 1.00f);
@@ -126,7 +126,7 @@ void set_style() {
     c[ImGuiCol_TabUnfocused]           = ImVec4(0.93f, 0.93f, 0.93f, 1.00f);
     c[ImGuiCol_TabUnfocusedActive]     = ImVec4(0.81f, 0.81f, 0.81f, 1.00f);
     c[ImGuiCol_DockingPreview]         = ImVec4(1.00f, 0.91f, 0.00f, 1.00f);
-    c[ImGuiCol_DockingEmptyBg]         = ImVec4(0.20f, 0.20f, 0.20f, 1.00f);
+    c[ImGuiCol_DockingEmptyBg]         = ImVec4(1.00f, 1.00f, 1.00f, 1.00f);
     c[ImGuiCol_PlotLines]              = ImVec4(0.61f, 0.61f, 0.61f, 1.00f);
     c[ImGuiCol_PlotLinesHovered]       = ImVec4(1.00f, 0.43f, 0.35f, 1.00f);
     c[ImGuiCol_PlotHistogram]          = ImVec4(0.90f, 0.70f, 0.00f, 1.00f);
@@ -156,19 +156,22 @@ int main() {
     while (!window::is_exiting()) {
         window::start_frame();
         ps.update(ed.lines);
-        ds.render();
-        ed.render(window::keyboard_input);
+
+        // Data
         ImGui::Begin("Data");
         ImGui::Text("Num ASTs:   %d", ps.num_asts);
         ImGui::Text("Cursor:     (%d,%d)", ed.cursor.x, ed.cursor.y);
         ImGui::Text("Buffer pos: %d", ed.get_buffer_position());
         ImGui::End();
-        ImGui::Begin("Nodes");
+
+        ds.render();
+        ed.render(window::keyboard_input, window::text_input);
+        ImGui::Begin("AST");
         ImGui::Unindent();
         render_tuple_tree(ps.tuples, ed.get_buffer_position());
         ImGui::Indent();
         ImGui::End();
-        ImGui::ShowDemoWindow(&show_demo_window);
+        //ImGui::ShowDemoWindow(&show_demo_window);
         window::end_frame();
     }
     window::destroy();

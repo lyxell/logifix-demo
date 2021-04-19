@@ -11,11 +11,11 @@ struct cursor_t {
 };
 
 class editor {
-    void handle_keypress(std::queue<SDL_Keycode>& input);
+    void handle_keypress(std::queue<SDL_Keysym>& input, std::string&);
 public:
     std::vector<std::string> lines;
     cursor_t cursor;
-    void render(std::queue<SDL_Keycode>& input);
+    void render(std::queue<SDL_Keysym>& input, std::string&);
     size_t get_buffer_position();
     editor();
 };
