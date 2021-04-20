@@ -9,6 +9,7 @@ editor::editor() {
         "",
         "public class Main {",
         "    public static void main(String[] args) {",
+        "        List<Integer> x = new ArrayList<>();",
         "        if (x.size() == 0) {",
         "            int x = 20;",
         "        }",
