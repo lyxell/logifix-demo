@@ -9,7 +9,7 @@ editor::editor() {
         "",
         "public class Main {",
         "    public static void main(String[] args) {",
-        "        if (10 - 20) {",
+        "        if (x.size() == 0) {",
         "            int x = 20;",
         "        }",
         "    }",
