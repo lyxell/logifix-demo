@@ -58,4 +58,6 @@ update_dependencies:
 	$(MAKE) -C $(SJP_DIR)
 
 clean:
+	$(MAKE) -C $(IMGUI_BOILERPLATE_DIR) clean
+	$(MAKE) -C $(SJP_DIR) clean
 	rm -rf build
