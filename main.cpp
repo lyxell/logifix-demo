@@ -1,5 +1,5 @@
 #include "imgui-boilerplate/window.hpp"
-#include "imgui.h"
+#include "imgui-boilerplate/imgui/imgui.h"
 #include "dockspace.hpp"
 #include "editor.hpp"
 #include "sjp/sjp.hpp"
