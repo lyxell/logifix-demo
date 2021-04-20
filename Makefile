@@ -29,9 +29,9 @@ endif
 
 .NOTPARALLEL: all
 
-all: update_dependencies build/app
+all: update_dependencies editor
 
-build/app:
+editor: editor.o dockspace.o main.o
 	@mkdir -p build
 	$(CXX) \
 		-o $@ \
@@ -46,9 +46,9 @@ build/app:
 		$(IMGUI_BOILERPLATE_DIR)/window.o \
 		$(SJP_DIR)/sjp.o \
 		$(SJP_DIR)/parser.o \
-		editor.cpp \
-		dockspace.cpp \
-		main.cpp \
+		editor.o \
+		dockspace.o \
+		main.o \
 		$(CXXFLAGS) $(LIBS)
 
 .PHONY: update_dependencies clean

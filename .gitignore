@@ -1,3 +1,4 @@
 imgui.ini
-build
 .gdb_history
+*.o
+editor

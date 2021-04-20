@@ -92,7 +92,7 @@ void editor::render(std::queue<SDL_Keysym>& input, std::string& text_input) {
         for (auto& line : lines) {
             ImGui::TableNextRow();
             ImGui::TableNextColumn();
-            ImGui::Text("%02d", row);
+            ImGui::TextDisabled("%02d", row);
             ImGui::TableNextColumn();
             // draw cursor
             if (row - 1 == cursor.y) {
