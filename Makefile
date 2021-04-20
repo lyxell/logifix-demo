@@ -27,6 +27,8 @@ ifeq ($(UNAME_S), Darwin) #APPLE
 	CFLAGS = $(CXXFLAGS)
 endif
 
+.NOTPARALLEL: all
+
 all: update_dependencies build/app
 
 build/app:
