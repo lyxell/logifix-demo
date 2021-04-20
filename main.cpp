@@ -81,7 +81,7 @@ void render_tuple_tree(std::shared_ptr<tuple_tree> t, size_t pos) {
 void set_style() {
 
     ImGuiIO& io = ImGui::GetIO(); (void)io;
-    io.Fonts->AddFontFromFileTTF("FiraMono-Regular.ttf", 14.0f);
+    io.Fonts->AddFontFromFileTTF("fonts/FiraMono-Regular.ttf", 14.0f);
     ImGuiStyle* style = &ImGui::GetStyle();
     style->WindowMenuButtonPosition = -1;
     style->TabRounding = 0.0f;
