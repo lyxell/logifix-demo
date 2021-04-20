@@ -67,9 +67,9 @@ void render_tuple_tree(std::shared_ptr<tuple_tree> t, size_t pos) {
         auto [sym, a, b] = tuple;
         ImGui::Indent();
         if (a <= pos && pos <= b) {
-            ImGui::Text("%s %d %d", sym.c_str(), a, b);
+            ImGui::Text("%s", sym.c_str());
         } else {
-            ImGui::TextDisabled("%s %d %d", sym.c_str(), a, b);
+            ImGui::TextDisabled("%s", sym.c_str());
         }
         for (auto child : children) {
             render_tuple_tree(child, pos);
