@@ -1,8 +1,8 @@
+#include "imgui.h"
 #include "imgui-boilerplate/window.hpp"
-#include "imgui-boilerplate/imgui/imgui.h"
 #include "dockspace.hpp"
 #include "editor.hpp"
-#include "sjp/sjp.hpp"
+#include "datalog-repair/program.hpp"
 #include <memory>
 
 using tuple = std::tuple<std::string,int,int>;
@@ -21,18 +21,17 @@ class parser_state {
     std::vector<std::string> data;
     public:
     std::shared_ptr<tuple_tree> tuples;
-    int num_asts;
     parser_state() {}
     void parse() {
-        sjp::parser parser;
+        repair::program program;
         std::string output;
         for (const auto& s : data) {
             output += s;
             output += "\n";
         }
-        parser.add_string("Example.java", output.c_str());
-        parser.parse();
-        std::vector<tuple> ts = parser.get_tuples("Example.java");
+        program.add_string("Example.java", output.c_str());
+        program.run();
+        std::vector<tuple> ts = program.get_ast_nodes("Example.java");
         std::sort(ts.begin(), ts.end(), [](tuple a, tuple b){
                 return std::pair(std::get<1>(a), std::get<2>(b)) <
                 std::pair(std::get<1>(b), std::get<2>(a));
@@ -50,7 +49,6 @@ class parser_state {
             stack.push_back(ref);
 
         }
-        num_asts = parser.num_asts();
     }
     void update(const std::vector<std::string>& u) {
         if (data != u) {
@@ -159,7 +157,6 @@ int main() {
 
         // Data
         ImGui::Begin("Data");
-        ImGui::Text("Num ASTs:   %d", ps.num_asts);
         ImGui::Text("Cursor:     (%d,%d)", ed.cursor.x, ed.cursor.y);
         ImGui::Text("Buffer pos: %d", ed.get_buffer_position());
         ImGui::End();

@@ -1,5 +1,5 @@
 #include "editor.hpp"
-#include "imgui-boilerplate/imgui/imgui.h"
+#include "imgui.h"
 #include <cstdlib>
 
 
