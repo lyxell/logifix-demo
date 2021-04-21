@@ -1,5 +1,20 @@
 IMGUI_BOILERPLATE_DIR = imgui-boilerplate
+IMGUI_BOILERPLATE_OBJS = $(IMGUI_BOILERPLATE_DIR)/imgui.o
+IMGUI_BOILERPLATE_OBJS += $(IMGUI_BOILERPLATE_DIR)/imgui_demo.o
+IMGUI_BOILERPLATE_OBJS += $(IMGUI_BOILERPLATE_DIR)/imgui_draw.o
+IMGUI_BOILERPLATE_OBJS += $(IMGUI_BOILERPLATE_DIR)/imgui_impl_opengl3.o
+IMGUI_BOILERPLATE_OBJS += $(IMGUI_BOILERPLATE_DIR)/imgui_impl_sdl.o
+IMGUI_BOILERPLATE_OBJS += $(IMGUI_BOILERPLATE_DIR)/imgui_widgets.o
+IMGUI_BOILERPLATE_OBJS += $(IMGUI_BOILERPLATE_DIR)/imgui_tables.o
+IMGUI_BOILERPLATE_OBJS += $(IMGUI_BOILERPLATE_DIR)/gl3w.o
+IMGUI_BOILERPLATE_OBJS += $(IMGUI_BOILERPLATE_DIR)/window.o
+
 SJP_DIR = sjp
+SJP_OBJS = $(SJP_DIR)/sjp.o
+SJP_OBJS += $(SJP_DIR)/parser.o
+
+OBJS = editor.o dockspace.o main.o
+
 LINUX_GL_LIBS = -lGL
 LIBS =
 UNAME_S := $(shell uname -s)
@@ -27,28 +42,12 @@ ifeq ($(UNAME_S), Darwin) #APPLE
 	CFLAGS = $(CXXFLAGS)
 endif
 
-.NOTPARALLEL: all
 
 all: update_dependencies editor
 
-editor: editor.o dockspace.o main.o
+editor: $(OBJS) $(IMGUI_BOILERPLATE_OBJS) $(SJP_OBJS)
 	@mkdir -p build
-	$(CXX) \
-		-o $@ \
-		$(IMGUI_BOILERPLATE_DIR)/imgui.o \
-		$(IMGUI_BOILERPLATE_DIR)/imgui_demo.o \
-		$(IMGUI_BOILERPLATE_DIR)/imgui_draw.o \
-		$(IMGUI_BOILERPLATE_DIR)/imgui_impl_opengl3.o \
-		$(IMGUI_BOILERPLATE_DIR)/imgui_impl_sdl.o \
-		$(IMGUI_BOILERPLATE_DIR)/imgui_widgets.o \
-		$(IMGUI_BOILERPLATE_DIR)/imgui_tables.o \
-		$(IMGUI_BOILERPLATE_DIR)/gl3w.o \
-		$(IMGUI_BOILERPLATE_DIR)/window.o \
-		$(SJP_DIR)/sjp.o \
-		$(SJP_DIR)/parser.o \
-		editor.o \
-		dockspace.o \
-		main.o \
+	$(CXX) -o $@ $(OBJS) $(IMGUI_BOILERPLATE_OBJS) $(SJP_OBJS) \
 		$(CXXFLAGS) $(LIBS)
 
 .PHONY: update_dependencies clean
