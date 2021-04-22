@@ -61,3 +61,4 @@ update_dependencies:
 
 clean:
 	$(MAKE) -C $(IMGUI_BOILERPLATE_DIR) clean
+	$(MAKE) -C datalog-repair clean

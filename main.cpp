@@ -5,72 +5,16 @@
 #include "datalog-repair/program.hpp"
 #include <memory>
 
-using tuple = std::tuple<std::string,int,int>;
-
-struct tuple_tree {
-    tuple head;
-    std::vector<std::shared_ptr<tuple_tree>> children;
-};
-
-bool tuple_contains(tuple a, tuple b) {
-    return std::get<1>(a) <= std::get<1>(b) && std::get<2>(a) >= std::get<2>(b);
-}
-
-class parser_state {
-    bool running = false;
-    std::vector<std::string> data;
-    public:
-    std::shared_ptr<tuple_tree> tuples;
-    parser_state() {}
-    void parse() {
-        repair::program program;
-        std::string output;
-        for (const auto& s : data) {
-            output += s;
-            output += "\n";
-        }
-        program.add_string("Example.java", output.c_str());
-        program.run();
-        std::vector<tuple> ts = program.get_ast_nodes("Example.java");
-        std::sort(ts.begin(), ts.end(), [](tuple a, tuple b){
-                return std::pair(std::get<1>(a), std::get<2>(b)) <
-                std::pair(std::get<1>(b), std::get<2>(a));
-                });
-        std::vector<std::shared_ptr<tuple_tree>> stack;
-        tuples = nullptr;
-        if (ts.size()) {
-            tuples = std::make_shared<tuple_tree>(tuple_tree {ts[0]});
-            stack.push_back(tuples);
-        }
-        for (size_t i = 1; i < ts.size(); i++) {
-            while (!tuple_contains(stack.back()->head, ts[i])) stack.pop_back();
-            auto ref = std::make_shared<tuple_tree>(tuple_tree {ts[i]});
-            stack.back()->children.push_back(ref);
-            stack.push_back(ref);
-
-        }
-    }
-    void update(const std::vector<std::string>& u) {
-        if (data != u) {
-            data = u;
-            std::cout << "updated data" << std::endl;
-            parse();
-        }
-    }
-};
-
-void render_tuple_tree(std::shared_ptr<tuple_tree> t, size_t pos) {
+void render_ast(std::shared_ptr<sjp::tree_node> t, size_t pos) {
     if (t) {
-        auto [tuple, children] = *t;
-        auto [sym, a, b] = tuple;
         ImGui::Indent();
-        if (a <= pos && pos <= b) {
-            ImGui::Text("%s", sym.c_str());
+        if (t->get_start_token() <= pos && pos <= t->get_end_token()) {
+            ImGui::Text("%s", t->get_name().c_str());
         } else {
-            ImGui::TextDisabled("%s", sym.c_str());
+            ImGui::TextDisabled("%s", t->get_name().c_str());
         }
-        for (auto child : children) {
-            render_tuple_tree(child, pos);
+        for (auto child : t->get_children()) {
+            render_ast(child, pos);
         }
         ImGui::Unindent();
     }
@@ -141,19 +85,18 @@ void set_style() {
     c[ImGuiCol_NavWindowingDimBg]      = ImVec4(0.80f, 0.80f, 0.80f, 0.20f);
     c[ImGuiCol_ModalWindowDimBg]       = ImVec4(1.00f, 0.91f, 0.00f, 1.00f);
 
-
 }
 
 int main() {
-    parser_state ps;
     dockspace ds;
     editor ed;
     window::init();
+    std::vector<std::string> prev_lines;
+    std::shared_ptr<sjp::tree_node> ast;
     set_style();
     bool show_demo_window = true;
     while (!window::is_exiting()) {
         window::start_frame();
-        ps.update(ed.lines);
 
         // Data
         ImGui::Begin("Data");
@@ -165,11 +108,24 @@ int main() {
         ed.render(window::keyboard_input, window::text_input);
         ImGui::Begin("AST");
         ImGui::Unindent();
-        render_tuple_tree(ps.tuples, ed.get_buffer_position());
+        render_ast(ast, ed.get_buffer_position());
         ImGui::Indent();
         ImGui::End();
         //ImGui::ShowDemoWindow(&show_demo_window);
         window::end_frame();
+
+        if (prev_lines != ed.lines) {
+            repair::program program;
+            std::string output;
+            for (const auto& s : ed.lines) {
+                output += s;
+                output += "\n";
+            }
+            program.add_string("Example.java", output.c_str());
+            program.run();
+            ast = program.get_ast("Example.java");
+            prev_lines = ed.lines;
+        }
     }
     window::destroy();
     return 0;
