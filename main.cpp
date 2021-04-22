@@ -5,9 +5,16 @@
 #include "datalog-repair/program.hpp"
 #include <memory>
 
+std::vector<std::pair<int,int>> repairs;
+
 void render_ast(std::shared_ptr<sjp::tree_node> t, size_t pos) {
     if (t) {
         ImGui::Indent();
+        if (t->get_name() == "equals_expression") {
+            repairs.emplace_back(
+                    t->get_start_token(),
+                    t->get_end_token());
+        }
         if (t->get_start_token() <= pos && pos <= t->get_end_token()) {
             ImGui::Text("%s", t->get_name().c_str());
         } else {
@@ -37,7 +44,8 @@ int main() {
         ImGui::End();
 
         ds.render();
-        ed.render(window::keyboard_input, window::text_input);
+        ed.render(window::keyboard_input, window::text_input, repairs);
+        repairs.clear();
         ImGui::Begin("AST");
         ImGui::Unindent();
         render_ast(ast, ed.get_buffer_position());

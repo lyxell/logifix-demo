@@ -1,7 +1,10 @@
 #include "editor.hpp"
 #include "imgui.h"
+#define IMGUI_DEFINE_MATH_OPERATORS
+#include "imgui_internal.h"
 #include <cstdlib>
-
+#include <optional>
+#include <iostream>
 
 editor::editor() {
     lines = {
@@ -78,7 +81,18 @@ void editor::handle_keypress(std::queue<SDL_Keysym>& input, std::string& text_in
     }
 }
 
-void editor::render(std::queue<SDL_Keysym>& input, std::string& text_input) {
+void editor::render(std::queue<SDL_Keysym>& input, std::string& text_input, const std::vector<std::pair<int,int>>& repairs) {
+
+    // returns intersection of two one-dimensional segments [a1,a2), [b1, b2)
+    auto intersection = [](std::pair<int,int> a, std::pair<int,int> b)
+        -> std::optional<std::pair<int,int>> {
+        // order a and b so that a lies to the left of b
+        if (a > b) std::swap(a, b);
+        if (a.second <= b.first) return {};
+        return std::pair(b.first, std::min(a.second, b.second));
+        
+    };
+
     ImGui::Begin("Editor");
     handle_keypress(input, text_input);
 	auto drawList = ImGui::GetWindowDrawList();
@@ -89,11 +103,35 @@ void editor::render(std::queue<SDL_Keysym>& input, std::string& text_input) {
         ImGui::TableSetupColumn("Editor#A", ImGuiTableColumnFlags_WidthFixed);
         ImGui::TableSetupColumn("Editor#B", ImGuiTableColumnFlags_WidthStretch);
         int row = 1;
+        int buf_pos = 0;
         for (auto& line : lines) {
             ImGui::TableNextRow();
             ImGui::TableNextColumn();
             ImGui::TextDisabled("%02d", row);
             ImGui::TableNextColumn();
+            // draw background
+            for (auto selection : repairs) {
+                auto is = intersection(selection, {buf_pos, buf_pos + line.size()});
+                if (is) {
+                    auto str_start = is->first - buf_pos;
+                    auto str_end = is->second - buf_pos;
+                    auto str = line.substr(str_start, str_end - str_start);
+                    auto str_prefix = line.substr(0, str_start);
+
+                    auto rect_upper_left = ImGui::GetCursorScreenPos() +
+                        ImVec2(ImGui::CalcTextSize(str_prefix.c_str()).x, 0.0f);
+                    auto rect_lower_right = rect_upper_left +
+                                                    ImGui::CalcTextSize(str.c_str());
+                    drawList->AddRectFilled(rect_upper_left,
+                                            rect_lower_right,
+                                            IM_COL32(255,200,200,255));
+                    if (ImGui::IsMouseHoveringRect(rect_upper_left, rect_lower_right)) {
+                        ImGui::BeginTooltip();
+                        ImGui::Text("I am a tooltip");
+                        ImGui::EndTooltip();
+                    }
+                }
+            }
             // draw cursor
             if (row - 1 == cursor.y) {
                 ImVec2 pos = ImGui::GetCursorScreenPos();
@@ -104,6 +142,7 @@ void editor::render(std::queue<SDL_Keysym>& input, std::string& text_input) {
             }
             ImGui::Text(line.c_str());
             row++;
+            buf_pos += line.size() + 1;
         }
         ImGui::EndTable();
     }
