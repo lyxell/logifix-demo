@@ -69,6 +69,7 @@ void editor::handle_keypress(std::queue<SDL_Keysym>& input, std::string& text_in
                         cursor.x = std::max(0, cursor.x - 1);
                         break;
                     case SDLK_RETURN:
+                        cursor.x = std::min(cursor.x, int(lines[cursor.y].size()));
                         lines.insert(lines.begin() + cursor.y + 1, lines[cursor.y].substr(cursor.x));
                         lines[cursor.y] = lines[cursor.y].substr(0, cursor.x);
                         cursor.y++;
