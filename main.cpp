@@ -35,15 +35,23 @@ int main() {
     editor ed;
     window::init();
     std::vector<std::string> prev_lines;
+    std::vector<std::tuple<std::string,int,int,std::string>> pretty_print;
     std::shared_ptr<sjp::tree_node> ast;
     bool show_demo_window = true;
     while (!window::is_exiting()) {
         window::start_frame();
 
-        // Data
-        ImGui::Begin("Data");
+        /*
+        ImGui::Begin("Editor data");
         ImGui::Text("Cursor:     (%d,%d)", ed.cursor.x, ed.cursor.y);
         ImGui::Text("Buffer pos: %d", ed.get_buffer_position());
+        ImGui::End();
+        */
+
+        ImGui::Begin("Pretty-print");
+        for (auto& [t1,t2,t3,t4] : pretty_print) {
+            ImGui::Text("%s %d %d %s", t1.c_str(), t2, t3, t4.c_str());
+        }
         ImGui::End();
 
         ds.render();
@@ -69,6 +77,7 @@ int main() {
             ast = program.get_ast("Example.java");
             repairable_nodes = program.get_repairable_nodes("Example.java");
             prev_lines = ed.lines;
+            pretty_print = program.get_pretty_print("Example.java");
         }
     }
     window::destroy();
