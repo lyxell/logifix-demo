@@ -1,4 +1,4 @@
-# thesis-editor
+# thesis-ui
 
 ## dependencies
 
