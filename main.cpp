@@ -4,18 +4,27 @@
 #include "editor.hpp"
 #include "datalog-repair/program.hpp"
 #include <memory>
+#include <map>
 
-std::vector<std::tuple<std::string,int,int>> repairable_nodes;
-std::vector<std::pair<int,int>> repairs;
+std::map<std::tuple<std::string,int,int>,
+            std::tuple<std::string,int,int>> repairable_nodes;
+std::vector<std::tuple<int,int,std::string>> rewrites;
+std::vector<std::tuple<std::string,int,int,std::string>> pretty_print;
 
 void render_ast(std::shared_ptr<sjp::tree_node> t, size_t pos) {
     if (t) {
         ImGui::Indent();
-        for (auto& [a,b,c] : repairable_nodes) {
-            if (a == t->get_name() && b == t->get_start_token() && c == t->get_end_token()) {
-                repairs.emplace_back(
-                        t->get_start_token(),
-                        t->get_end_token());
+        for (auto& [key, value] : repairable_nodes) {
+            auto& [k1, k2, k3] = key;
+            auto& [v1, v2, v3] = value;
+            if (k1 == t->get_name() &&
+                k2 == t->get_start_token() &&
+                k3 == t->get_end_token()) {
+                for (auto [p1, p2, p3, p4] : pretty_print) {
+                    if (p1 == v1 && p2 == v2 && p3 == v3) {
+                        rewrites.emplace_back(k2, k3, p4);
+                    }
+                }
             }
         }
         if (t->get_start_token() <= pos && pos <= t->get_end_token()) {
@@ -35,7 +44,6 @@ int main() {
     editor ed;
     window::init();
     std::vector<std::string> prev_lines;
-    std::vector<std::tuple<std::string,int,int,std::string>> pretty_print;
     std::shared_ptr<sjp::tree_node> ast;
     bool show_demo_window = true;
     while (!window::is_exiting()) {
@@ -55,8 +63,8 @@ int main() {
         ImGui::End();
 
         ds.render();
-        ed.render(window::keyboard_input, window::text_input, repairs);
-        repairs.clear();
+        ed.render(window::keyboard_input, window::text_input, rewrites);
+        rewrites.clear();
         ImGui::Begin("AST");
         ImGui::Unindent();
         render_ast(ast, ed.get_buffer_position());

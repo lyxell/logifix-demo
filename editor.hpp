@@ -16,7 +16,7 @@ public:
     std::vector<std::string> lines;
     cursor_t cursor;
     void render(std::queue<SDL_Keysym>&, std::string&,
-            const std::vector<std::pair<int,int>>&);
+            const std::vector<std::tuple<int,int,std::string>>&);
     size_t get_buffer_position();
     editor();
 };

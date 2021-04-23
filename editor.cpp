@@ -5,6 +5,7 @@
 #include <cstdlib>
 #include <optional>
 #include <iostream>
+#include <tuple>
 
 editor::editor() {
     lines = {
@@ -82,16 +83,15 @@ void editor::handle_keypress(std::queue<SDL_Keysym>& input, std::string& text_in
     }
 }
 
-void editor::render(std::queue<SDL_Keysym>& input, std::string& text_input, const std::vector<std::pair<int,int>>& repairs) {
+void editor::render(std::queue<SDL_Keysym>& input, std::string& text_input, const std::vector<std::tuple<int,int,std::string>>& repairs) {
 
     // returns intersection of two one-dimensional segments [a1,a2), [b1, b2)
     auto intersection = [](std::pair<int,int> a, std::pair<int,int> b)
-        -> std::optional<std::pair<int,int>> {
+         -> std::optional<std::pair<int,int>> {
         // order a and b so that a lies to the left of b
         if (a > b) std::swap(a, b);
         if (a.second <= b.first) return {};
         return std::pair(b.first, std::min(a.second, b.second));
-        
     };
 
     ImGui::Begin("Editor");
@@ -112,7 +112,7 @@ void editor::render(std::queue<SDL_Keysym>& input, std::string& text_input, cons
             ImGui::TableNextColumn();
             // draw background
             for (auto selection : repairs) {
-                auto is = intersection(selection, {buf_pos, buf_pos + line.size()});
+                auto is = intersection({std::get<0>(selection), std::get<1>(selection)}, {buf_pos, buf_pos + line.size()});
                 if (is) {
                     auto str_start = is->first - buf_pos;
                     auto str_end = is->second - buf_pos;
@@ -128,8 +128,12 @@ void editor::render(std::queue<SDL_Keysym>& input, std::string& text_input, cons
                                             IM_COL32(255,200,200,255));
                     if (ImGui::IsMouseHoveringRect(rect_upper_left, rect_lower_right)) {
                         ImGui::BeginTooltip();
-                        ImGui::Text("I am a tooltip");
+                        ImGui::Text("Double-click to rewrite to %s", std::get<2>(selection).c_str());
                         ImGui::EndTooltip();
+                    }
+                    if (ImGui::IsMouseHoveringRect(rect_upper_left, rect_lower_right) && ImGui::IsMouseDoubleClicked(0)) {
+                        auto change = std::get<2>(selection);
+                        line = line.substr(0, str_start) + change + line.substr(str_end);
                     }
                 }
             }
