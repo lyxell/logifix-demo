@@ -51,7 +51,7 @@ void dockspace::render() {
         ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
     }
 
-    ImGui::Begin("DockSpace Demo", &p_open, window_flags);
+    ImGui::Begin("thesis-ui", &p_open, window_flags);
 
     if (!opt_padding) {
         ImGui::PopStyleVar();
@@ -74,7 +74,7 @@ void dockspace::render() {
         if (ImGui::BeginMenu("Options"))
         {
             ImGui::MenuItem("Fullscreen", NULL, &opt_fullscreen);
-            ImGui::MenuItem("Padding", NULL, &opt_padding);
+            //ImGui::MenuItem("Padding", NULL, &opt_padding);
             ImGui::Separator();
 
             ImGui::EndMenu();

@@ -47,9 +47,19 @@ sudo apt install -y \
 make
 ```
 
-The result should be a local executable file called `editor` that
-when executed shows a graphical user interface.
+#### Usage
 
-The graphical user interface has two main views: a text editor
-containing a Java file and a view containing the AST for the file
-that is currently editing.
+The result of the build process should be a local executable file
+called `editor` that when executed shows a graphical user
+interface.
+
+The graphical user interface has two main views: the source code view
+containing a Java file and the AST view containing the AST for
+the file in the source code view.
+
+There is two main ways to interact with the source code view.
+
+1. You may edit the file using the keyboard (use arrow keys to
+   move the cursor).
+2. Any available repairs will be highlighted with a red
+   background. You may double-click to perform this repair.

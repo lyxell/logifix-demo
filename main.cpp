@@ -49,6 +49,8 @@ int main() {
     while (!window::is_exiting()) {
         window::start_frame();
 
+        ds.render();
+
         /*
         ImGui::Begin("Editor data");
         ImGui::Text("Cursor:     (%d,%d)", ed.cursor.x, ed.cursor.y);
@@ -56,13 +58,14 @@ int main() {
         ImGui::End();
         */
 
+        /*
         ImGui::Begin("Pretty-print");
         for (auto& [t1,t2,t3,t4] : pretty_print) {
             ImGui::Text("%s %d %d %s", t1.c_str(), t2, t3, t4.c_str());
         }
         ImGui::End();
+        */
 
-        ds.render();
         ed.render(window::keyboard_input, window::text_input, rewrites);
         rewrites.clear();
         ImGui::Begin("AST");
