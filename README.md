@@ -49,6 +49,8 @@ make
 
 #### Usage
 
+**Using the user interface**
+
 The result of the build process should be a local executable file
 called `editor` that when executed shows a graphical user
 interface.
@@ -65,3 +67,15 @@ There is two main ways to interact with the source code view.
    background. You may double-click to perform this repair.
 
 ![](https://i.imgur.com/DV55pn4.gif)
+
+**Defining new repairs**
+
+1. Create a new file in `datalog-repair/rules/`
+
+2. Include this file in `datalog-repair/repair.dl`
+
+3. Re-run `make`
+
+See `datalog-repair/rules/1155.dl` for reference. However,
+currently there is no API reference for how to match AST nodes,
+this is a work in progress.
