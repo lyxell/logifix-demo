@@ -23,6 +23,11 @@ void find_rewrites(std::shared_ptr<sjp::tree_node> node) {
     for (auto [symbol, child] : node->get_parent_of()) {
         find_rewrites(child);
     }
+    for (auto [symbol, children] : node->get_parent_of_list()) {
+        for (auto child : children) {
+            find_rewrites(child);
+        }
+    }
 }
 
 void render_ast(std::shared_ptr<sjp::tree_node> node, size_t pos) {
@@ -89,14 +94,12 @@ int main() {
         ImGui::End();
         */
 
-        /*
         ImGui::Begin("Repairs");
         for (auto [k, v] : repairable_nodes) {
             auto [str, a, b] = k;
             ImGui::Text("%s %d %d %s", str.c_str(), a, b, v.c_str());
         }
         ImGui::End();
-        */
 
         /*
         ImGui::Begin("String representations");
