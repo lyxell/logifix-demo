@@ -1,5 +1,8 @@
 # thesis-ui
 
+Note: During development it might be a good idea to use
+`export CXX=ccache g++` to speed up recompilation.
+
 ## Getting started
 
 ### Debian/Ubuntu
