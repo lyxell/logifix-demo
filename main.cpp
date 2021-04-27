@@ -8,6 +8,7 @@
 
 std::map<std::tuple<std::string,int,int>,std::string> repairable_nodes;
 std::map<std::tuple<std::string,int,int>,std::string> to_string;
+std::map<std::tuple<std::string,int,int>,std::vector<std::string>> declared_vars;
 std::vector<std::tuple<int,int,std::string>> rewrites;
 
 void find_rewrites(std::shared_ptr<sjp::tree_node> node) {
@@ -101,6 +102,21 @@ int main() {
         }
         ImGui::End();
 
+        ImGui::Begin("Declared variables (work in progress)");
+        std::set<std::string> vars;
+        for (auto [k, v] : declared_vars) {
+            auto [str, a, b] = k;
+            if (a <= ed.get_buffer_position()
+             && b >= ed.get_buffer_position()) {
+                for (const auto& str : v) {
+                    vars.insert(str);
+                }
+            }
+        }
+        for (auto str : vars)
+            ImGui::Text("%s", str.c_str());
+        ImGui::End();
+
         /*
         ImGui::Begin("String representations");
         for (auto [k, v] : to_string) {
@@ -127,11 +143,13 @@ int main() {
                 output += s;
                 output += "\n";
             }
-            rep.add_string("Example.java", output.c_str());
+            const char* filename = "Example.java";
+            rep.add_string(filename, output.c_str());
             rep.run();
-            ast = rep.get_ast("Example.java");
-            repairable_nodes = rep.get_repairable_nodes("Example.java");
-            to_string = rep.get_string_representation("Example.java");
+            ast = rep.get_ast(filename);
+            repairable_nodes = rep.get_repairable_nodes(filename);
+            declared_vars = rep.get_reachable_declared_variables(filename);
+            to_string = rep.get_string_representation(filename);
             prev_lines = ed.lines;
         }
     }
