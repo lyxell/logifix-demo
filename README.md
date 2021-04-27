@@ -36,6 +36,7 @@ sudo apt install -y \
 ./bootstrap
 ./configure
 make
+sudo make install
 ```
 
 #### Step 2
