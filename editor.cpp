@@ -35,6 +35,7 @@ size_t editor::get_buffer_position() {
 void editor::handle_keypress(std::queue<SDL_Keysym>& input, std::string& text_input) {
     if (ImGui::IsWindowFocused(ImGuiFocusedFlags_ChildWindows)) {
         if (text_input.size()) {
+            cursor.x = std::min(cursor.x, int(lines[cursor.y].size()));
             lines[cursor.y].insert(cursor.x, text_input);
             cursor.x += text_input.size();
             text_input = {};
