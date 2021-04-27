@@ -28,7 +28,7 @@ size_t editor::get_buffer_position() {
     size_t result = 0;
     for (int i = 0; i < cursor.y; i++)
         result += lines[i].size() + 1; // 1 extra for newline
-    result += cursor.x;
+    result += std::min(cursor.x, int(lines[cursor.y].size()));
     return result;
 }
 

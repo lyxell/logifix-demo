@@ -20,35 +20,53 @@ void find_rewrites(std::shared_ptr<sjp::tree_node> node) {
         rewrites.emplace_back(node->get_start_token(),
                               node->get_end_token(), v);
     }
-    for (auto [symbol, children] : node->get_children()) {
-        for (auto child : children) find_rewrites(child);
+    for (auto [symbol, child] : node->get_parent_of()) {
+        find_rewrites(child);
     }
 }
 
-void render_ast(std::string symbol,
-        std::vector<std::shared_ptr<sjp::tree_node>> nodes, size_t pos) {
-    auto is_hovered = [pos](std::shared_ptr<sjp::tree_node> node) {
-        if (!node) return false;
-        return node->get_start_token() <= pos
-               && node->get_end_token() >= pos;
+void render_ast(std::shared_ptr<sjp::tree_node> node, size_t pos) {
+    if (node == nullptr) return;
+    auto is_hovered = [pos](std::shared_ptr<sjp::tree_node> n) {
+        if (!n) return false;
+        return n->get_start_token() <= pos
+               && n->get_end_token() >= pos;
     };
-    if (std::any_of(nodes.begin(), nodes.end(), is_hovered)) {
-        ImGui::Text("%s:", symbol.c_str());
-        for (auto t : nodes) {
-            if (!t) continue;
-            if (is_hovered(t)) {
-                ImGui::Text("* %s", t->get_name().c_str());
-                ImGui::Indent();
-                for (auto [symbol, children] : t->get_children()) {
-                    render_ast(symbol, children, pos);
-                }
-                ImGui::Unindent();
-            } else {
-                ImGui::TextDisabled("* %s", t->get_name().c_str());
-            }
+    if (is_hovered(node)) {
+        ImGui::Text("%s", node->get_name().c_str());
+        ImGui::Indent();
+        for (auto [symbol, child] : node->get_parent_of()) {
+            auto Text = is_hovered(child) ? ImGui::Text : ImGui::TextDisabled;
+            Text("%s:", symbol.c_str());
+            ImGui::SameLine();
+            if (child) render_ast(child, pos);
+            else Text("nil");
         }
+        for (auto [symbol, children] : node->get_parent_of_list()) {
+            bool hover =
+                std::any_of(children.begin(), children.end(), is_hovered);
+            auto Text = hover ? ImGui::Text : ImGui::TextDisabled;
+            Text("%s:", symbol.c_str());
+            ImGui::Indent();
+            int counter = 0;
+            for (auto child : children) {
+                auto InnerText = is_hovered(child) ? ImGui::Text : ImGui::TextDisabled;
+                ImGui::Unindent();
+                InnerText("[%d]", counter);
+                ImGui::Indent();
+                ImGui::SameLine();
+                render_ast(child, pos);
+                counter++;
+            }
+            if (!children.size()) {
+                ImGui::SameLine();
+                Text("nil");
+            }
+            ImGui::Unindent();
+        }
+        ImGui::Unindent();
     } else {
-        ImGui::TextDisabled("%s", symbol.c_str());
+        ImGui::TextDisabled("%s", node->get_name().c_str());
     }
 }
 
@@ -94,7 +112,7 @@ int main() {
         rewrites.clear();
         find_rewrites(ast);
         ImGui::Begin("AST");
-        render_ast("root", {ast}, ed.get_buffer_position());
+        render_ast(ast, ed.get_buffer_position());
         ImGui::End();
         //ImGui::ShowDemoWindow(&show_demo_window);
         window::end_frame();
