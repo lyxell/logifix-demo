@@ -1,6 +1,8 @@
 #pragma once
 
-class dockspace {
-public:
-    void render();
-};
+namespace ui {
+    class dockspace {
+    public:
+        void render();
+    };
+}

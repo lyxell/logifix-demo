@@ -1,7 +1,7 @@
 #include "dockspace.hpp"
 #include "imgui-boilerplate/imgui/imgui.h"
 
-void dockspace::render() {
+void ui::dockspace::render() {
 
     bool p_open = true;
     static bool opt_fullscreen = true;

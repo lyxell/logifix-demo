@@ -7,24 +7,14 @@
 #include <iostream>
 #include <tuple>
 
-editor::editor() {
-    lines = {
-        "import java.util.ArrayList;",
-        "",
-        "public class Main {",
-        "    public static void main(String[] args) {",
-        "        ArrayList<Integer> x = new ArrayList<>();",
-        "        if (x.size() == 0) {",
-        "            System.out.println(\"empty\");",
-        "        }",
-        "    }",
-        "}",
-    };
-    cursor.x = 0;
-    cursor.y = 0;
+ui::editor::editor(const std::string& filename)
+    : filename(filename), cursor(), changed(false) {}
+ui::editor::editor(const std::string& filename,
+               const std::vector<std::string>& lines)
+    : filename(filename), lines(lines), cursor(), changed(true) {
 }
 
-size_t editor::get_buffer_position() {
+size_t ui::editor::get_buffer_position() {
     size_t result = 0;
     for (int i = 0; i < cursor.y; i++)
         result += lines[i].size() + 1; // 1 extra for newline
@@ -32,13 +22,23 @@ size_t editor::get_buffer_position() {
     return result;
 }
 
-void editor::handle_keypress(std::queue<SDL_Keysym>& input, std::string& text_input) {
+std::string ui::editor::get_source() {
+    std::string output;
+    for (const auto& s : lines) {
+        output += s;
+        output += "\n";
+    }
+    return output;
+}
+
+void ui::editor::handle_keypress(std::queue<SDL_Keysym>& input, std::string& text_input) {
     if (ImGui::IsWindowFocused(ImGuiFocusedFlags_ChildWindows)) {
         if (text_input.size()) {
             cursor.x = std::min(cursor.x, int(lines[cursor.y].size()));
             lines[cursor.y].insert(cursor.x, text_input);
             cursor.x += text_input.size();
             text_input = {};
+            changed = true;
         }
         while (input.size()) {
             if (input.front().mod == KMOD_NONE) {
@@ -79,12 +79,13 @@ void editor::handle_keypress(std::queue<SDL_Keysym>& input, std::string& text_in
                         break;
                 }
             }
+            changed = true;
             input.pop();
         }
     }
 }
 
-void editor::render(std::queue<SDL_Keysym>& input, std::string& text_input, const std::vector<std::tuple<int,int,std::string>>& repairs) {
+void ui::editor::render(std::queue<SDL_Keysym>& input, std::string& text_input, const std::vector<std::tuple<int,int,std::string>>& repairs) {
 
     // returns intersection of two one-dimensional segments [a1,a2), [b1, b2)
     auto intersection = [](std::pair<int,int> a, std::pair<int,int> b)
@@ -95,7 +96,7 @@ void editor::render(std::queue<SDL_Keysym>& input, std::string& text_input, cons
         return std::pair(b.first, std::min(a.second, b.second));
     };
 
-    ImGui::Begin("Editor");
+    ImGui::Begin(("ui::editor " + filename).c_str());
     handle_keypress(input, text_input);
 	auto drawList = ImGui::GetWindowDrawList();
     const size_t NUM_COLUMNS = 2;
@@ -153,4 +154,10 @@ void editor::render(std::queue<SDL_Keysym>& input, std::string& text_input, cons
         ImGui::EndTable();
     }
     ImGui::End();
+}
+
+bool ui::editor::has_changes() {
+    bool result = changed;
+    changed = false;
+    return result;
 }

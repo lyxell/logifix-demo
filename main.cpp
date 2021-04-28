@@ -1,4 +1,5 @@
 #include "imgui.h"
+#include "ast.hpp"
 #include "imgui-boilerplate/window.hpp"
 #include "dockspace.hpp"
 #include "editor.hpp"
@@ -6,6 +7,7 @@
 #include <memory>
 #include <map>
 
+/*
 std::map<std::tuple<std::string,int,int>,std::string> repairable_nodes;
 std::map<std::tuple<std::string,int,int>,std::string> to_string;
 std::map<std::tuple<std::string,int,int>,std::vector<std::string>> declared_vars;
@@ -29,129 +31,50 @@ void find_rewrites(std::shared_ptr<sjp::tree_node> node) {
             find_rewrites(child);
         }
     }
-}
-
-void render_ast(std::shared_ptr<sjp::tree_node> node, size_t pos) {
-    if (node == nullptr) return;
-    auto is_hovered = [pos](std::shared_ptr<sjp::tree_node> n) {
-        if (!n) return false;
-        return n->get_start_token() <= pos
-               && n->get_end_token() >= pos;
-    };
-    if (is_hovered(node)) {
-        ImGui::Text("%s", node->get_name().c_str());
-        ImGui::Indent();
-        for (auto [symbol, child] : node->get_parent_of()) {
-            auto Text = is_hovered(child) ? ImGui::Text : ImGui::TextDisabled;
-            Text("%s:", symbol.c_str());
-            ImGui::SameLine();
-            if (child) render_ast(child, pos);
-            else Text("nil");
-        }
-        for (auto [symbol, children] : node->get_parent_of_list()) {
-            bool hover =
-                std::any_of(children.begin(), children.end(), is_hovered);
-            auto Text = hover ? ImGui::Text : ImGui::TextDisabled;
-            Text("%s:", symbol.c_str());
-            ImGui::Indent();
-            int counter = 0;
-            for (auto child : children) {
-                auto InnerText = is_hovered(child) ? ImGui::Text : ImGui::TextDisabled;
-                ImGui::Unindent();
-                InnerText("[%d]", counter);
-                ImGui::Indent();
-                ImGui::SameLine();
-                render_ast(child, pos);
-                counter++;
-            }
-            if (!children.size()) {
-                ImGui::SameLine();
-                Text("nil");
-            }
-            ImGui::Unindent();
-        }
-        ImGui::Unindent();
-    } else {
-        ImGui::TextDisabled("%s", node->get_name().c_str());
-    }
-}
+}*/
 
 int main() {
-    dockspace ds;
-    editor ed;
+    std::string filename = "Example.java";
+    repair repair_program;
+    ui::dockspace dockspace;
+    std::vector<std::string> lines = {
+        "import java.util.ArrayList;",
+        "",
+        "public class Main {",
+        "    public static void main(String[] args) {",
+        "        ArrayList<Integer> x = new ArrayList<>();",
+        "        if (x.size() == 0) {",
+        "            System.out.println(\"empty\");",
+        "        }",
+        "    }",
+        "}",
+    };
+    ui::editor editor(filename, lines);
     window::init();
-    std::vector<std::string> prev_lines;
     std::shared_ptr<sjp::tree_node> ast;
     bool show_demo_window = true;
     while (!window::is_exiting()) {
+
+        if (editor.has_changes()) {
+            repair_program = {};
+            repair_program.add_string(filename.c_str(),
+                                      editor.get_source().c_str());
+            repair_program.run();
+        }
         window::start_frame();
 
-        ds.render();
+        dockspace.render();
 
-        /*
-        ImGui::Begin("Editor data");
-        ImGui::Text("Cursor:     (%d,%d)", ed.cursor.x, ed.cursor.y);
-        ImGui::Text("Buffer pos: %d", ed.get_buffer_position());
-        ImGui::End();
-        */
+        editor.render(window::keyboard_input, window::text_input, {});
 
-        ImGui::Begin("Repairs");
-        for (auto [k, v] : repairable_nodes) {
-            auto [str, a, b] = k;
-            ImGui::Text("%s %d %d %s", str.c_str(), a, b, v.c_str());
-        }
-        ImGui::End();
+        ui::ast::render(filename,
+                        repair_program.get_ast(filename.c_str()),
+                        editor.get_buffer_position());
 
-        ImGui::Begin("Declared variables (work in progress)");
-        std::set<std::string> vars;
-        for (auto [k, v] : declared_vars) {
-            auto [str, a, b] = k;
-            if (a <= ed.get_buffer_position()
-             && b >= ed.get_buffer_position()) {
-                for (const auto& str : v) {
-                    vars.insert(str);
-                }
-            }
-        }
-        for (auto str : vars)
-            ImGui::Text("%s", str.c_str());
-        ImGui::End();
-
-        /*
-        ImGui::Begin("String representations");
-        for (auto [k, v] : to_string) {
-            auto [str, a, b] = k;
-            ImGui::Text("%s %d %d", str.c_str(), a, b);
-            ImGui::Text("%s", v.c_str());
-        }
-        ImGui::End();
-        */
-
-        ed.render(window::keyboard_input, window::text_input, rewrites);
-        rewrites.clear();
-        find_rewrites(ast);
-        ImGui::Begin("AST");
-        render_ast(ast, ed.get_buffer_position());
-        ImGui::End();
         //ImGui::ShowDemoWindow(&show_demo_window);
+
         window::end_frame();
 
-        if (prev_lines != ed.lines) {
-            repair rep;
-            std::string output;
-            for (const auto& s : ed.lines) {
-                output += s;
-                output += "\n";
-            }
-            const char* filename = "Example.java";
-            rep.add_string(filename, output.c_str());
-            rep.run();
-            ast = rep.get_ast(filename);
-            repairable_nodes = rep.get_repairable_nodes(filename);
-            declared_vars = rep.get_reachable_declared_variables(filename);
-            to_string = rep.get_string_representation(filename);
-            prev_lines = ed.lines;
-        }
     }
     window::destroy();
     return 0;

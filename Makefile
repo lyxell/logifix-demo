@@ -19,7 +19,7 @@ DATALOG_REPAIR_OBJS += $(DATALOG_REPAIR_DIR)/sjp/parser.o
 #SJP_OBJS = $(SJP_DIR)/sjp.o
 #SJP_OBJS += $(SJP_DIR)/parser.o
 
-OBJS = editor.o dockspace.o main.o
+OBJS = editor.o dockspace.o main.o ast.o
 
 LINUX_GL_LIBS = -lGL
 LIBS =
