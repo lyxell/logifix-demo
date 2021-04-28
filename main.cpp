@@ -1,8 +1,8 @@
 #include "imgui.h"
-#include "ast.hpp"
-#include "imgui-boilerplate/window.hpp"
-#include "dockspace.hpp"
-#include "editor.hpp"
+#include "ast.h"
+#include "imgui-boilerplate/window.h"
+#include "dockspace.h"
+#include "editor.h"
 #include "datalog-repair/repair.hpp"
 #include <memory>
 #include <map>

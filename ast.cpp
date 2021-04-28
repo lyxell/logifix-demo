@@ -1,4 +1,4 @@
-#include "ast.hpp"
+#include "ast.h"
 #include "imgui.h"
 
 void ui::ast::render_node(std::shared_ptr<sjp::tree_node> node, size_t pos) {
