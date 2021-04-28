@@ -1,6 +1,6 @@
 #pragma once
 #include <string>
-#include "datalog-repair/repair.hpp"
+#include "datalog-repair/repair.h"
 
 namespace ui {
     namespace ast {

@@ -3,7 +3,7 @@
 #include "imgui-boilerplate/window.h"
 #include "dockspace.h"
 #include "editor.h"
-#include "datalog-repair/repair.hpp"
+#include "datalog-repair/repair.h"
 #include <memory>
 #include <map>
 
