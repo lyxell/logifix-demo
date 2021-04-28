@@ -39,7 +39,9 @@ int main() {
 
         dockspace.render();
 
-        editor.render(window::keyboard_input, window::text_input, {});
+        editor.render(window::keyboard_input,
+                      window::text_input,
+                      repair_program.get_possible_repairs(filename.c_str()));
 
         ui::ast::render(filename,
                         repair_program.get_ast(filename.c_str()),
