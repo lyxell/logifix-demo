@@ -12,10 +12,9 @@ void ui::dockspace::render() {
     // window not dockable into, because it would be confusing to have two
     // docking targets within each others.
 
-    ImGuiWindowFlags window_flags = ImGuiWindowFlags_MenuBar |
-                                    ImGuiWindowFlags_NoDocking;
-    if (opt_fullscreen)
-    {
+    ImGuiWindowFlags window_flags =
+        ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoDocking;
+    if (opt_fullscreen) {
         const ImGuiViewport* viewport = ImGui::GetMainViewport();
         ImGui::SetNextWindowPos(viewport->WorkPos);
         ImGui::SetNextWindowSize(viewport->WorkSize);
@@ -23,13 +22,11 @@ void ui::dockspace::render() {
         ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
         ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
         window_flags |= ImGuiWindowFlags_NoTitleBar |
-            ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize |
-            ImGuiWindowFlags_NoMove;
-        window_flags |= ImGuiWindowFlags_NoBringToFrontOnFocus |
-            ImGuiWindowFlags_NoNavFocus;
-    }
-    else
-    {
+                        ImGuiWindowFlags_NoCollapse |
+                        ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove |
+                        ImGuiWindowFlags_NoBringToFrontOnFocus |
+                        ImGuiWindowFlags_NoNavFocus;
+    } else {
         dockspace_flags &= ~ImGuiDockNodeFlags_PassthruCentralNode;
     }
 
@@ -63,25 +60,21 @@ void ui::dockspace::render() {
 
     // DockSpace
     ImGuiIO& io = ImGui::GetIO();
-    if (io.ConfigFlags & ImGuiConfigFlags_DockingEnable)
-    {
+    if (io.ConfigFlags & ImGuiConfigFlags_DockingEnable) {
         ImGuiID dockspace_id = ImGui::GetID("MyDockSpace");
         ImGui::DockSpace(dockspace_id, ImVec2(0.0f, 0.0f), dockspace_flags);
     }
 
-    if (ImGui::BeginMenuBar())
-    {
-        if (ImGui::BeginMenu("Options"))
-        {
+    if (ImGui::BeginMenuBar()) {
+        if (ImGui::BeginMenu("Options")) {
             ImGui::MenuItem("Fullscreen", NULL, &opt_fullscreen);
-            //ImGui::MenuItem("Padding", NULL, &opt_padding);
+            // ImGui::MenuItem("Padding", NULL, &opt_padding);
             ImGui::Separator();
 
             ImGui::EndMenu();
         }
         ImGui::EndMenuBar();
     }
-
 
     ImGui::End();
 }
