@@ -7,7 +7,7 @@
 #include <map>
 #include <memory>
 
-int main() {
+auto main() -> int {
     std::string filename = "Example.java";
     repair repair_program;
     ui::dockspace dockspace;
@@ -28,7 +28,6 @@ int main() {
     std::shared_ptr<sjp::tree_node> ast;
     bool show_demo_window = true;
     while (!window::is_exiting()) {
-
         if (editor.has_changes()) {
             repair_program = {};
             repair_program.add_string(filename.c_str(),
@@ -36,17 +35,12 @@ int main() {
             repair_program.run();
         }
         window::start_frame();
-
         dockspace.render();
-
         editor.render(window::keyboard_input, window::text_input,
                       repair_program.get_possible_repairs(filename.c_str()));
-
         ui::ast::render(filename, repair_program.get_ast(filename.c_str()),
                         editor.get_buffer_position());
-
         // ImGui::ShowDemoWindow(&show_demo_window);
-
         window::end_frame();
     }
     window::destroy();

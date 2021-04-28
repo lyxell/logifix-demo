@@ -7,21 +7,22 @@
 #include <optional>
 #include <tuple>
 
-ui::editor::editor(const std::string& filename)
-    : filename(filename), cursor(), changed(false) {}
-ui::editor::editor(const std::string& filename,
-                   const std::vector<std::string>& lines)
-    : filename(filename), lines(lines), cursor(), changed(true) {}
+ui::editor::editor(std::string filename)
+    : filename(std::move(filename)), cursor(), changed(false) {}
+ui::editor::editor(std::string filename, std::vector<std::string> lines)
+    : filename(std::move(filename)), lines(std::move(lines)), cursor(),
+      changed(true) {}
 
-size_t ui::editor::get_buffer_position() {
+auto ui::editor::get_buffer_position() -> size_t {
     size_t result = 0;
-    for (int i = 0; i < cursor.y; i++)
+    for (int i = 0; i < cursor.y; i++) {
         result += lines[i].size() + 1; // 1 extra for newline
+    }
     result += std::min(cursor.x, int(lines[cursor.y].size()));
     return result;
 }
 
-std::string ui::editor::get_source() {
+auto ui::editor::get_source() -> std::string {
     std::string output;
     for (const auto& s : lines) {
         output += s;
@@ -30,17 +31,17 @@ std::string ui::editor::get_source() {
     return output;
 }
 
-void ui::editor::handle_keypress(std::queue<SDL_Keysym>& input,
-                                 std::string& text_input) {
+auto ui::editor::handle_keypress(std::queue<SDL_Keysym>& input,
+                                 std::string& text_input) -> void {
     if (ImGui::IsWindowFocused(ImGuiFocusedFlags_ChildWindows)) {
-        if (text_input.size()) {
+        if (!text_input.empty()) {
             cursor.x = std::min(cursor.x, int(lines[cursor.y].size()));
             lines[cursor.y].insert(cursor.x, text_input);
             cursor.x += text_input.size();
             text_input = {};
             changed = true;
         }
-        while (input.size()) {
+        while (!input.empty()) {
             if (input.front().mod == KMOD_NONE) {
                 switch (input.front().sym) {
                 case SDLK_UP:
@@ -87,25 +88,27 @@ void ui::editor::handle_keypress(std::queue<SDL_Keysym>& input,
     }
 }
 
-void ui::editor::render(
+auto ui::editor::render(
     std::queue<SDL_Keysym>& input, std::string& text_input,
-    const std::vector<std::tuple<int, int, std::string>>& repairs) {
+    const std::vector<std::tuple<int, int, std::string>>& repairs) -> void {
 
     // returns intersection of two one-dimensional segments [a1,a2), [b1, b2)
     auto intersection =
         [](std::pair<int, int> a,
            std::pair<int, int> b) -> std::optional<std::pair<int, int>> {
         // order a and b so that a lies to the left of b
-        if (a > b)
+        if (a > b) {
             std::swap(a, b);
-        if (a.second <= b.first)
+        }
+        if (a.second <= b.first) {
             return {};
+        }
         return std::pair(b.first, std::min(a.second, b.second));
     };
 
     ImGui::Begin(("ui::editor " + filename).c_str());
     handle_keypress(input, text_input);
-    auto drawList = ImGui::GetWindowDrawList();
+    auto* drawList = ImGui::GetWindowDrawList();
     const size_t NUM_COLUMNS = 2;
     static ImGuiTableFlags flags =
         ImGuiTableFlags_SizingFixedFit | ImGuiTableFlags_Hideable;
@@ -148,8 +151,10 @@ void ui::editor::render(
                                                    rect_lower_right) &&
                         ImGui::IsMouseDoubleClicked(0)) {
                         auto change = std::get<2>(selection);
-                        line = line.substr(0, str_start) + change +
-                               line.substr(str_end);
+                        std::string new_string = line.substr(0, str_start);
+                        new_string += change;
+                        new_string += line.substr(str_end);
+                        line = std::move(new_string);
                     }
                 }
             }
@@ -162,7 +167,7 @@ void ui::editor::render(
                 ImVec2 vend(pos.x + 1.0f, pos.y + ImGui::GetTextLineHeight());
                 drawList->AddRectFilled(vstart, vend, IM_COL32(0, 0, 0, 255));
             }
-            ImGui::Text(line.c_str());
+            ImGui::Text("%s", line.c_str());
             row++;
             buf_pos += line.size() + 1;
         }
@@ -171,7 +176,7 @@ void ui::editor::render(
     ImGui::End();
 }
 
-bool ui::editor::has_changes() {
+auto ui::editor::has_changes() -> bool {
     bool result = changed;
     changed = false;
     return result;

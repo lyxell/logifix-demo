@@ -1,11 +1,12 @@
 #include "ast.h"
 #include "imgui.h"
 
-void ui::ast::render_node(std::shared_ptr<sjp::tree_node> node, size_t pos) {
+void ui::ast::render_node(const std::shared_ptr<sjp::tree_node>& node,
+                          size_t pos) {
     if (node == nullptr) {
         return;
     }
-    auto is_hovered = [pos](std::shared_ptr<sjp::tree_node> n) {
+    auto is_hovered = [pos](const std::shared_ptr<sjp::tree_node>& n) {
         if (!n) {
             return false;
         }
@@ -24,14 +25,14 @@ void ui::ast::render_node(std::shared_ptr<sjp::tree_node> node, size_t pos) {
                 Text("nil");
             }
         }
-        for (auto [symbol, children] : node->get_parent_of_list()) {
+        for (const auto& [symbol, children] : node->get_parent_of_list()) {
             bool hover =
                 std::any_of(children.begin(), children.end(), is_hovered);
             auto Text = hover ? ImGui::Text : ImGui::TextDisabled;
             Text("%s:", symbol.c_str());
             ImGui::Indent();
             int counter = 0;
-            for (auto child : children) {
+            for (const auto& child : children) {
                 auto InnerText =
                     is_hovered(child) ? ImGui::Text : ImGui::TextDisabled;
                 ImGui::Unindent();
@@ -41,7 +42,7 @@ void ui::ast::render_node(std::shared_ptr<sjp::tree_node> node, size_t pos) {
                 render_node(child, pos);
                 counter++;
             }
-            if (!children.size()) {
+            if (children.empty()) {
                 ImGui::SameLine();
                 Text("nil");
             }
@@ -54,7 +55,8 @@ void ui::ast::render_node(std::shared_ptr<sjp::tree_node> node, size_t pos) {
 }
 
 void ui::ast::render(const std::string& filename,
-                     std::shared_ptr<sjp::tree_node> node, size_t position) {
+                     const std::shared_ptr<sjp::tree_node>& node,
+                     size_t position) {
     ImGui::Begin(("ui::ast " + filename).c_str());
     render_node(node, position);
     ImGui::End();

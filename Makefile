@@ -22,7 +22,7 @@ DATALOG_REPAIR_OBJS += $(DATALOG_REPAIR_DIR)/sjp/parser.o
 OBJS = editor.o dockspace.o main.o ast.o
 
 LINUX_GL_LIBS = -lGL
-LIBS =
+LIBS = -lm
 UNAME_S := $(shell uname -s)
 CXXFLAGS = -std=c++17 -O2 -I$(IMGUI_BOILERPLATE_DIR)/imgui
 

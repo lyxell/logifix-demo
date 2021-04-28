@@ -1,7 +1,7 @@
 #include "dockspace.h"
 #include "imgui-boilerplate/imgui/imgui.h"
 
-void ui::dockspace::render() {
+auto ui::dockspace::render() -> void {
 
     bool p_open = true;
     static bool opt_fullscreen = true;
@@ -67,7 +67,7 @@ void ui::dockspace::render() {
 
     if (ImGui::BeginMenuBar()) {
         if (ImGui::BeginMenu("Options")) {
-            ImGui::MenuItem("Fullscreen", NULL, &opt_fullscreen);
+            ImGui::MenuItem("Fullscreen", nullptr, &opt_fullscreen);
             // ImGui::MenuItem("Padding", NULL, &opt_padding);
             ImGui::Separator();
 

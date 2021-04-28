@@ -20,12 +20,12 @@ class editor {
     bool changed;
 
   public:
-    editor(const std::string& filename);
-    editor(const std::string& filename, const std::vector<std::string>& lines);
-    void render(std::queue<SDL_Keysym>&, std::string&,
-                const std::vector<std::tuple<int, int, std::string>>&);
-    size_t get_buffer_position();
-    std::string get_source();
-    bool has_changes();
+    editor(std::string filename);
+    editor(std::string filename, std::vector<std::string> lines);
+    auto render(std::queue<SDL_Keysym>&, std::string&,
+                const std::vector<std::tuple<int, int, std::string>>&) -> void;
+    auto get_buffer_position() -> size_t;
+    auto get_source() -> std::string;
+    auto has_changes() -> bool;
 };
 } // namespace ui
