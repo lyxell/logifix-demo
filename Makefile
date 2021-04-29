@@ -1,30 +1,12 @@
-IMGUI_BOILERPLATE_DIR = imgui-boilerplate
-IMGUI_BOILERPLATE_OBJS = $(IMGUI_BOILERPLATE_DIR)/imgui.o
-IMGUI_BOILERPLATE_OBJS += $(IMGUI_BOILERPLATE_DIR)/imgui_demo.o
-IMGUI_BOILERPLATE_OBJS += $(IMGUI_BOILERPLATE_DIR)/imgui_draw.o
-IMGUI_BOILERPLATE_OBJS += $(IMGUI_BOILERPLATE_DIR)/imgui_impl_opengl3.o
-IMGUI_BOILERPLATE_OBJS += $(IMGUI_BOILERPLATE_DIR)/imgui_impl_sdl.o
-IMGUI_BOILERPLATE_OBJS += $(IMGUI_BOILERPLATE_DIR)/imgui_widgets.o
-IMGUI_BOILERPLATE_OBJS += $(IMGUI_BOILERPLATE_DIR)/imgui_tables.o
-IMGUI_BOILERPLATE_OBJS += $(IMGUI_BOILERPLATE_DIR)/gl3w.o
-IMGUI_BOILERPLATE_OBJS += $(IMGUI_BOILERPLATE_DIR)/window.o
-
-DATALOG_REPAIR_DIR = datalog-repair
-DATALOG_REPAIR_OBJS = $(DATALOG_REPAIR_DIR)/program.o
-DATALOG_REPAIR_OBJS += $(DATALOG_REPAIR_DIR)/repair.o
-DATALOG_REPAIR_OBJS += $(DATALOG_REPAIR_DIR)/sjp/sjp.o
-DATALOG_REPAIR_OBJS += $(DATALOG_REPAIR_DIR)/sjp/parser.o
-
-#SJP_DIR = sjp
-#SJP_OBJS = $(SJP_DIR)/sjp.o
-#SJP_OBJS += $(SJP_DIR)/parser.o
+IMGUI_BOILERPLATE_ARCHIVE=imgui-boilerplate/imgui-boilerplate.a
+DATALOG_REPAIR_ARCHIVE=datalog-repair/datalog-repair.a
 
 OBJS = editor.o dockspace.o main.o ast.o
 
-LINUX_GL_LIBS = -lGL
 LIBS = -lm
 UNAME_S := $(shell uname -s)
-CXXFLAGS = -std=c++17 -O2 -I$(IMGUI_BOILERPLATE_DIR)/imgui
+CXXFLAGS = -std=c++17 -O2
+CXXFLAGS += -Iimgui-boilerplate/imgui
 
 ##---------------------------------------------------------------------
 ## BUILD FLAGS PER PLATFORM
@@ -32,7 +14,7 @@ CXXFLAGS = -std=c++17 -O2 -I$(IMGUI_BOILERPLATE_DIR)/imgui
 
 ifeq ($(UNAME_S), Linux) #LINUX
 	ECHO_MESSAGE = "Linux"
-	LIBS += $(LINUX_GL_LIBS) -ldl `sdl2-config --libs`
+	LIBS += -lGL -ldl `sdl2-config --libs`
 
 	CXXFLAGS += `sdl2-config --cflags`
 	CFLAGS = $(CXXFLAGS)
@@ -49,18 +31,18 @@ ifeq ($(UNAME_S), Darwin) #APPLE
 endif
 
 
-all: update_dependencies editor
+all: editor
 
-editor: $(OBJS) $(IMGUI_BOILERPLATE_OBJS) $(DATALOG_REPAIR_OBJS)
-	$(CXX) -o $@ $^ $(CXXFLAGS) $(LIBS)
+editor: $(OBJS) $(IMGUI_BOILERPLATE_ARCHIVE) $(DATALOG_REPAIR_ARCHIVE)
+	$(CXX) -o $@ -Wl,--whole-archive $^ -Wl,--no-whole-archive $(CXXFLAGS) $(LIBS) 
 
-.PHONY: update_dependencies clean
+$(IMGUI_BOILERPLATE_ARCHIVE):
+	$(MAKE) -C imgui-boilerplate
 
-update_dependencies:
-	$(MAKE) -C $(IMGUI_BOILERPLATE_DIR)
+$(DATALOG_REPAIR_ARCHIVE):
 	$(MAKE) -C datalog-repair
 
 clean:
-	$(MAKE) -C $(IMGUI_BOILERPLATE_DIR) clean
+	$(MAKE) -C imgui-boilerplate clean
 	$(MAKE) -C datalog-repair clean
 	rm -rf $(OBJS)
