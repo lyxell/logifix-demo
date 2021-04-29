@@ -22,10 +22,10 @@ class editor {
   public:
     editor(std::string filename);
     editor(std::string filename, std::vector<std::string> lines);
-    auto render(std::queue<SDL_Keysym>&, std::string&,
-                const std::vector<std::tuple<int, int, std::string>>&) -> void;
-    auto get_buffer_position() -> size_t;
-    auto get_source() -> std::string;
-    auto has_changes() -> bool;
+    void render(std::queue<SDL_Keysym>&, std::string&,
+                const std::vector<std::tuple<int, int, std::string>>&);
+    size_t get_buffer_position();
+    std::string get_source();
+    bool has_changes();
 };
 } // namespace ui

@@ -13,7 +13,7 @@ ui::editor::editor(std::string filename, std::vector<std::string> lines)
     : filename(std::move(filename)), lines(std::move(lines)), cursor(),
       changed(true) {}
 
-auto ui::editor::get_buffer_position() -> size_t {
+size_t ui::editor::get_buffer_position() {
     size_t result = 0;
     for (int i = 0; i < cursor.y; i++) {
         result += lines[i].size() + 1; // 1 extra for newline
@@ -22,7 +22,7 @@ auto ui::editor::get_buffer_position() -> size_t {
     return result;
 }
 
-auto ui::editor::get_source() -> std::string {
+std::string ui::editor::get_source() {
     std::string output;
     for (const auto& s : lines) {
         output += s;
@@ -31,8 +31,8 @@ auto ui::editor::get_source() -> std::string {
     return output;
 }
 
-auto ui::editor::handle_keypress(std::queue<SDL_Keysym>& input,
-                                 std::string& text_input) -> void {
+void ui::editor::handle_keypress(std::queue<SDL_Keysym>& input,
+                                 std::string& text_input) {
     if (ImGui::IsWindowFocused(ImGuiFocusedFlags_ChildWindows)) {
         if (!text_input.empty()) {
             cursor.x = std::min(cursor.x, int(lines[cursor.y].size()));
@@ -88,9 +88,9 @@ auto ui::editor::handle_keypress(std::queue<SDL_Keysym>& input,
     }
 }
 
-auto ui::editor::render(
+void ui::editor::render(
     std::queue<SDL_Keysym>& input, std::string& text_input,
-    const std::vector<std::tuple<int, int, std::string>>& repairs) -> void {
+    const std::vector<std::tuple<int, int, std::string>>& repairs) {
 
     // returns intersection of two one-dimensional segments [a1,a2), [b1, b2)
     auto intersection =
@@ -176,7 +176,7 @@ auto ui::editor::render(
     ImGui::End();
 }
 
-auto ui::editor::has_changes() -> bool {
+bool ui::editor::has_changes() {
     bool result = changed;
     changed = false;
     return result;

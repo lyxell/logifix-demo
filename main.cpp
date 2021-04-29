@@ -7,7 +7,7 @@
 #include <map>
 #include <memory>
 
-auto main() -> int {
+int main() {
     std::string filename = "Example.java";
     repair repair_program;
     ui::dockspace dockspace;
