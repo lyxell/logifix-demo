@@ -8,33 +8,27 @@ UNAME_S := $(shell uname -s)
 CXXFLAGS = -std=c++17 -O2
 CXXFLAGS += -Iimgui-boilerplate/imgui
 
-##---------------------------------------------------------------------
-## BUILD FLAGS PER PLATFORM
-##---------------------------------------------------------------------
-
-ifeq ($(UNAME_S), Linux) #LINUX
-	ECHO_MESSAGE = "Linux"
+# LINUX
+ifeq ($(UNAME_S), Linux)
 	LIBS += -lGL -ldl `sdl2-config --libs`
-
 	CXXFLAGS += `sdl2-config --cflags`
-	CFLAGS = $(CXXFLAGS)
 endif
 
-ifeq ($(UNAME_S), Darwin) #APPLE
-	ECHO_MESSAGE = "Mac OS X"
-	LIBS += -framework OpenGL -framework Cocoa -framework IOKit -framework CoreVideo `sdl2-config --libs`
+# APPLE
+ifeq ($(UNAME_S), Darwin)
+	LIBS += -framework OpenGL -framework Cocoa -framework IOKit
+	LIBS += -framework CoreVideo `sdl2-config --libs`
 	LIBS += -L/usr/local/lib -L/opt/local/lib
-
 	CXXFLAGS += `sdl2-config --cflags`
-	CXXFLAGS += -I/usr/local/include -I/opt/local/include
+	CXXFLAGS += -I/usr/local/include
+	CXXFLAGS += -I/opt/local/include
 	CFLAGS = $(CXXFLAGS)
 endif
-
 
 all: editor
 
 editor: $(OBJS) $(IMGUI_BOILERPLATE_ARCHIVE) $(DATALOG_REPAIR_ARCHIVE)
-	$(CXX) -o $@ -Wl,--whole-archive $^ -Wl,--no-whole-archive $(CXXFLAGS) $(LIBS) 
+	$(CXX) -o $@ -Wl,--whole-archive $^ -Wl,--no-whole-archive $(LIBS)
 
 $(IMGUI_BOILERPLATE_ARCHIVE):
 	$(MAKE) -C imgui-boilerplate
@@ -46,3 +40,4 @@ clean:
 	$(MAKE) -C imgui-boilerplate clean
 	$(MAKE) -C datalog-repair clean
 	rm -rf $(OBJS)
+
