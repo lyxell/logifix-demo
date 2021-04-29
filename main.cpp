@@ -15,12 +15,12 @@ int main() {
         "import java.util.ArrayList;",
         "",
         "public class Main {",
-        "    public static void main(String[] args) {",
-        "        ArrayList<Integer> x = new ArrayList<>();",
-        "        if (x.size() == 0) {",
-        "            System.out.println(\"empty\");",
-        "        }",
+        "  public static void main(String[] args) {",
+        "    ArrayList<Integer> x = new ArrayList<>();",
+        "    if (x.size() == 0) {",
+        "      System.out.println(\"empty\");",
         "    }",
+        "  }",
         "}",
     };
     ui::editor editor(filename, lines);

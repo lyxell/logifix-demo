@@ -30,6 +30,8 @@ all: editor
 editor: $(OBJS) $(IMGUI_BOILERPLATE_ARCHIVE) $(DATALOG_REPAIR_ARCHIVE)
 	$(CXX) -o $@ -Wl,--whole-archive $^ -Wl,--no-whole-archive $(LIBS)
 
+.PHONY: $(DATALOG_REPAIR_ARCHIVE)
+
 $(IMGUI_BOILERPLATE_ARCHIVE):
 	$(MAKE) -C imgui-boilerplate
 

@@ -3,3 +3,4 @@ imgui.ini
 *.o
 editor
 compile_commands.json
+*.csv
