@@ -57,7 +57,7 @@ void ui::ast::render_node(const std::shared_ptr<sjp::tree_node>& node,
 void ui::ast::render(const std::string& filename,
                      const std::shared_ptr<sjp::tree_node>& node,
                      size_t position) {
-    ImGui::Begin(("ui::ast " + filename).c_str());
+    ImGui::Begin((filename + " AST").c_str());
     render_node(node, position);
     ImGui::End();
 }

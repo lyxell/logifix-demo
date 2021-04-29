@@ -51,6 +51,7 @@ void ui::editor::handle_keypress(std::queue<SDL_Keysym>& input,
                     cursor.y = std::min(int(lines.size()) - 1, cursor.y + 1);
                     break;
                 case SDLK_BACKSPACE:
+                    changed = true;
                     cursor.x = std::min(cursor.x, int(lines[cursor.y].size()));
                     if (cursor.x > 0) {
                         auto line = lines[cursor.y];
@@ -73,6 +74,7 @@ void ui::editor::handle_keypress(std::queue<SDL_Keysym>& input,
                     cursor.x = std::max(0, cursor.x - 1);
                     break;
                 case SDLK_RETURN:
+                    changed = true;
                     cursor.x = std::min(cursor.x, int(lines[cursor.y].size()));
                     lines.insert(lines.begin() + cursor.y + 1,
                                  lines[cursor.y].substr(cursor.x));
@@ -82,7 +84,6 @@ void ui::editor::handle_keypress(std::queue<SDL_Keysym>& input,
                     break;
                 }
             }
-            changed = true;
             input.pop();
         }
     }
@@ -106,7 +107,7 @@ void ui::editor::render(
         return std::pair(b.first, std::min(a.second, b.second));
     };
 
-    ImGui::Begin(("ui::editor " + filename).c_str());
+    ImGui::Begin((filename + " Editor").c_str());
     handle_keypress(input, text_input);
     auto* drawList = ImGui::GetWindowDrawList();
     const size_t NUM_COLUMNS = 2;

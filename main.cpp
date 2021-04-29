@@ -40,6 +40,12 @@ int main() {
                       repair_program.get_possible_repairs(filename.c_str()));
         ui::ast::render(filename, repair_program.get_ast(filename.c_str()),
                         editor.get_buffer_position());
+        ImGui::Begin("Variables in scope");
+        for (const auto& [str, type] : repair_program.get_variables_in_scope(filename.c_str(), editor.get_buffer_position())) {
+            const auto& [n, a, b] = type;
+            ImGui::Text("%s (%s)", str.c_str(), n.c_str());
+        }
+        ImGui::End();
         // ImGui::ShowDemoWindow(&show_demo_window);
         window::end_frame();
     }

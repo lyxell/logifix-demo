@@ -5,7 +5,7 @@ OBJS = editor.o dockspace.o main.o ast.o
 
 LIBS = -lm
 UNAME_S := $(shell uname -s)
-CXXFLAGS = -std=c++17 -O2
+CXXFLAGS = -std=c++17 -O2 -g
 CXXFLAGS += -Iimgui-boilerplate/imgui
 
 # LINUX
