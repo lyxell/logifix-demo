@@ -11,7 +11,7 @@ Note: During development it might be a good idea to use
 
 Building might take ~15 minutes to complete.
 
-```
+```bash
 git clone https://github.com/souffle-lang/souffle.git
 cd souffle
 sudo apt install -y \
@@ -40,13 +40,13 @@ make
 
 #### Step 2 (Building)
 
-```
+```bash
+# Dependencies
+sudo apt install -y libsdl2-dev re2c
+# Build
 git clone https://github.com/lyxell/thesis-ui.git
 cd thesis-ui
 git submodule update --init --recursive
-sudo apt install -y \
-    libsdl2-dev \
-    re2c
 export SOUFFLE_PATH=/path/to/where/you/built/souffle
 make
 ```
