@@ -1,11 +1,11 @@
 IMGUI_BOILERPLATE_ARCHIVE=imgui-boilerplate/imgui-boilerplate.a
 DATALOG_REPAIR_ARCHIVE=datalog-repair/datalog-repair.a
 
-OBJS = editor.o dockspace.o main.o ast.o
+OBJS = editor.o dockspace.o main.o ast.o program.o
 
 LIBS = -lm
 UNAME_S := $(shell uname -s)
-CXXFLAGS = -std=c++17 -O2 -g
+CXXFLAGS = -std=c++17 -fPIC -O2 -g
 CXXFLAGS += -Iimgui-boilerplate/imgui
 
 # LINUX
@@ -25,10 +25,13 @@ ifeq ($(UNAME_S), Darwin)
 	CFLAGS = $(CXXFLAGS)
 endif
 
-all: editor
+all: editor libprogram.so
 
-editor: $(OBJS) $(IMGUI_BOILERPLATE_ARCHIVE) $(DATALOG_REPAIR_ARCHIVE)
-	$(CXX) -o $@ -Wl,--whole-archive $^ -Wl,--no-whole-archive $(LIBS)
+libprogram.so: program.o $(DATALOG_REPAIR_ARCHIVE)
+	$(CXX) -o $@ -shared -Wl,--whole-archive $^ -Wl,--no-whole-archive
+
+editor: main.o editor.o dockspace.o $(IMGUI_BOILERPLATE_ARCHIVE)
+	$(CXX) -o $@ $^ $(LIBS)
 
 .PHONY: $(DATALOG_REPAIR_ARCHIVE)
 
