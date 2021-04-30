@@ -4,3 +4,4 @@ imgui.ini
 editor
 compile_commands.json
 *.csv
+*.so

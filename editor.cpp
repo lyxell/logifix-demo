@@ -156,6 +156,7 @@ void ui::editor::render(
                         new_string += change;
                         new_string += line.substr(str_end);
                         line = std::move(new_string);
+                        changed = true;
                     }
                 }
             }
