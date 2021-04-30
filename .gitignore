@@ -1,7 +1,6 @@
-imgui.ini
 .gdb_history
 *.o
 editor
 compile_commands.json
 *.csv
-libprogram.so
+*.so

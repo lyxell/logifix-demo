@@ -1,7 +1,6 @@
 # thesis-ui
 
-Note: During development it might be a good idea to use
-`export CXX=ccache g++` to speed up recompilation.
+![](https://i.imgur.com/KJDHi5n.gif)
 
 ## Getting started
 
@@ -11,8 +10,8 @@ Note: During development it might be a good idea to use
 
 Building might take ~15 minutes to complete.
 
-```
-git clone https://github.com/souffle-lang/souffle.git
+```bash
+git clone --depth 1 https://github.com/souffle-lang/souffle.git
 cd souffle
 sudo apt install -y \
     autoconf \
@@ -36,22 +35,22 @@ sudo apt install -y \
 ./bootstrap
 ./configure
 make
-sudo make install
 ```
 
-#### Step 2
+#### Step 2 (Building)
 
-```
+```bash
+# Dependencies
+sudo apt install -y libsdl2-dev re2c
+# Build
 git clone https://github.com/lyxell/thesis-ui.git
 cd thesis-ui
 git submodule update --init --recursive
-sudo apt install -y \
-    libsdl2-dev \
-    re2c
+export SOUFFLE_PATH=/path/to/where/you/built/souffle
 make
 ```
 
-#### Usage
+## Usage
 
 **Using the user interface**
 
@@ -69,8 +68,6 @@ There is two main ways to interact with the source code view.
    move the cursor).
 2. Any available repairs will be highlighted with a red
    background. You may double-click to perform this repair.
-
-![](https://i.imgur.com/DV55pn4.gif)
 
 **Defining new repairs**
 

@@ -8,6 +8,12 @@ UNAME_S := $(shell uname -s)
 CXXFLAGS = -std=c++17 -fPIC -O2 -g
 CXXFLAGS += -Iimgui-boilerplate/imgui
 
+SOUFFLE=souffle
+ifdef SOUFFLE_PATH
+	SOUFFLE=$(SOUFFLE_PATH:%/=%)/src/souffle
+	CXXFLAGS+=-I$(SOUFFLE_PATH:%/=%)/src/include
+endif
+
 # LINUX
 ifeq ($(UNAME_S), Linux)
 	LIBS += -lGL -ldl `sdl2-config --libs`

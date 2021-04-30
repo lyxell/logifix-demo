@@ -88,14 +88,3 @@ int main() {
     return 0;
 }
 
-
-/*
-ui::ast::render(filename, repair_program.get_ast(filename.c_str()),
-                editor.get_buffer_position());
-ImGui::Begin("Variables in scope");
-for (const auto& [str, type] : repair_program.get_variables_in_scope(filename.c_str(), editor.get_buffer_position())) {
-    const auto& [n, a, b] = type;
-    ImGui::Text("%s (%s)", str.c_str(), n.c_str());
-}
-ImGui::End();
-*/
