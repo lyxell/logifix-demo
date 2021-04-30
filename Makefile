@@ -36,7 +36,7 @@ all: editor libprogram.so
 libprogram.so: program.o $(DATALOG_REPAIR_ARCHIVE)
 	$(CXX) -o $@ -shared -Wl,--whole-archive $^ -Wl,--no-whole-archive
 
-editor: main.o editor.o dockspace.o $(IMGUI_BOILERPLATE_ARCHIVE)
+editor: main.o editor.o dockspace.o ast.o $(IMGUI_BOILERPLATE_ARCHIVE)
 	$(CXX) -o $@ $^ $(LIBS)
 
 .PHONY: $(DATALOG_REPAIR_ARCHIVE)

@@ -73,6 +73,11 @@ int main() {
         s.text_input = window::text_input;
         ui::dockspace::render();
         ui::editor::render(&s);
+        if (!s.ast.expired()) {
+            ui::ast::render("Test", s.ast.lock(), 0);
+        } else {
+            ui::ast::render("Test", nullptr, 0);
+        }
         if (s.show_demo_window) {
             ImGui::ShowDemoWindow();
         }

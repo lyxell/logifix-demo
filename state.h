@@ -6,6 +6,7 @@
 #include <utility>
 #include <string>
 #include <sys/stat.h>
+#include "ast.h"
 
 struct state {
     ino_t inode;
@@ -16,4 +17,5 @@ struct state {
     std::queue<SDL_Keysym> keyboard_input;
     std::string text_input;
     bool dirty;
+    std::weak_ptr<sjp::tree_node> ast;
 };
