@@ -1,7 +1,6 @@
 # thesis-ui
 
-Note: During development it might be a good idea to use
-`export CXX=ccache g++` to speed up recompilation.
+![](https://i.imgur.com/KJDHi5n.gif)
 
 ## Getting started
 
@@ -69,8 +68,6 @@ There is two main ways to interact with the source code view.
    move the cursor).
 2. Any available repairs will be highlighted with a red
    background. You may double-click to perform this repair.
-
-![](https://i.imgur.com/DV55pn4.gif)
 
 **Defining new repairs**
 
