@@ -12,7 +12,7 @@ Note: During development it might be a good idea to use
 Building might take ~15 minutes to complete.
 
 ```bash
-git clone https://github.com/souffle-lang/souffle.git
+git clone --depth 1 https://github.com/souffle-lang/souffle.git
 cd souffle
 sudo apt install -y \
     autoconf \
