@@ -55,7 +55,7 @@ export SOUFFLE_PATH=/path/to/where/you/built/souffle
 make
 ```
 
-#### Usage
+## Usage
 
 **Using the user interface**
 
