@@ -36,10 +36,9 @@ sudo apt install -y \
 ./bootstrap
 ./configure
 make
-sudo make install
 ```
 
-#### Step 2
+#### Step 2 (Setup)
 
 ```
 git clone https://github.com/lyxell/thesis-ui.git
@@ -48,6 +47,11 @@ git submodule update --init --recursive
 sudo apt install -y \
     libsdl2-dev \
     re2c
+```
+
+#### Step 3 (Building)
+```
+export SOUFFLE_PATH=/path/to/where/you/built/souffle
 make
 ```
 
