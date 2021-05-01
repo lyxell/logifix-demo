@@ -9,8 +9,8 @@
 const char* libpath = "./libprogram.so";
 
 int main() {
-    void* handle;
-    void* render_function;
+    void* handle = nullptr;
+    void* render_function = nullptr;
     state s = {
         .lines = {
             "import java.util.ArrayList;",
@@ -66,7 +66,7 @@ int main() {
             "}",
         },
         .cursor = {0, 0},
-        .show_demo_window = false
+        .show_demo_window = true
     };
     std::string filename = "Example.java";
     window::init();
