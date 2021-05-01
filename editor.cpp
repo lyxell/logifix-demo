@@ -13,26 +13,6 @@ static const auto HIGHLIGHT_COLOR_CLICKED = IM_COL32(255, 212, 69, 255);
 static const auto HIGHLIGHT_PADDING = ImVec2(2.0f, 1.0f);
 static const auto HIGHLIGHT_ROUNDING = 2.0f;
 
-/*
-size_t ui::editor::get_buffer_position() {
-    size_t result = 0;
-    for (int i = 0; i < cursor.y; i++) {
-        result += lines[i].size() + 1; // 1 extra for newline
-    }
-    result += std::min(cursor.x, int(lines[cursor.y].size()));
-    return result;
-}
-
-std::string ui::editor::get_source() {
-    std::string output;
-    for (const auto& s : lines) {
-        output += s;
-        output += "\n";
-    }
-    return output;
-}
-*/
-
 void ui::editor::handle_keypress(state* s) {
     auto& lines = s->lines;
     auto& [x, y] = s->cursor;

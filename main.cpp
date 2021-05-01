@@ -107,10 +107,18 @@ int main() {
         s.text_input = window::text_input;
         ui::dockspace::render();
         ui::editor::render(&s);
+
+        size_t buffer_position = 0;
+        for (int i = 0; i < s.cursor.second; i++) {
+            buffer_position += s.lines[i].size() + 1; // 1 extra for newline
+        }
+        buffer_position +=
+            std::min(s.cursor.first, int(s.lines[s.cursor.second].size()));
+
         if (!s.ast.expired()) {
-            ui::ast::render("Test", s.ast.lock(), 0);
+            ui::ast::render("Test", s.ast.lock(), buffer_position);
         } else {
-            ui::ast::render("Test", nullptr, 0);
+            ui::ast::render("Test", nullptr, buffer_position);
         }
         if (s.show_demo_window) {
             ImGui::ShowDemoWindow();
