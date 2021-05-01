@@ -99,8 +99,8 @@ void ui::editor::handle_keypress(state* s) {
 }
 
 // returns intersection of two one-dimensional segments [a1,a2), [b1, b2)
-static std::optional<std::pair<int,int>> intersection(std::pair<int, int> a,
-        std::pair<int, int> b) {
+static std::optional<std::pair<int, int>> intersection(std::pair<int, int> a,
+                                                       std::pair<int, int> b) {
     if (a > b) {
         std::swap(a, b);
     }
@@ -110,7 +110,8 @@ static std::optional<std::pair<int,int>> intersection(std::pair<int, int> a,
     return std::pair(b.first, std::min(a.second, b.second));
 }
 
-static void render_line(state* s, std::string& line, int& x, int& y, int buf_pos, int row) {
+static void render_line(state* s, std::string& line, int& x, int& y,
+                        int buf_pos, int row) {
     auto* drawList = ImGui::GetWindowDrawList();
     ImGui::TableNextRow();
     ImGui::TableNextColumn();
@@ -118,9 +119,8 @@ static void render_line(state* s, std::string& line, int& x, int& y, int buf_pos
     ImGui::TableNextColumn();
     // draw highlights
     for (auto selection : s->repairs) {
-        auto is = intersection(
-            {std::get<0>(selection), std::get<1>(selection)},
-            {buf_pos, buf_pos + line.size()});
+        auto is = intersection({std::get<0>(selection), std::get<1>(selection)},
+                               {buf_pos, buf_pos + line.size()});
         if (!is) {
             continue;
         }
@@ -135,8 +135,8 @@ static void render_line(state* s, std::string& line, int& x, int& y, int buf_pos
         auto rect_lower_right = rect_upper_left +
                                 ImGui::CalcTextSize(str.c_str()) +
                                 HIGHLIGHT_PADDING;
-        auto hovered = ImGui::IsMouseHoveringRect(rect_upper_left,
-                                                  rect_lower_right);
+        auto hovered =
+            ImGui::IsMouseHoveringRect(rect_upper_left, rect_lower_right);
         auto color = HIGHLIGHT_COLOR;
         auto clicked = hovered && ImGui::IsMouseDown(0);
         auto double_clicked = hovered && ImGui::IsMouseDoubleClicked(0);
@@ -146,8 +146,8 @@ static void render_line(state* s, std::string& line, int& x, int& y, int buf_pos
         if (clicked) {
             color = HIGHLIGHT_COLOR_CLICKED;
         }
-        drawList->AddRectFilled(rect_upper_left, rect_lower_right,
-                                color, HIGHLIGHT_ROUNDING);
+        drawList->AddRectFilled(rect_upper_left, rect_lower_right, color,
+                                HIGHLIGHT_ROUNDING);
         if (hovered) {
             ImGui::BeginTooltip();
             ImGui::Text("Double-click to rewrite to %s",

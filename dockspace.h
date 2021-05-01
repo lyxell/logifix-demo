@@ -1,5 +1,5 @@
 #pragma once
 
 namespace ui::dockspace {
-    void render();
+void render();
 } // namespace ui::dockspace
