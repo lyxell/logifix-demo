@@ -6,71 +6,70 @@
 #include <dlfcn.h>
 #include <iostream>
 
+static const std::string file = R"(import java.util.ArrayList;
+
+public class Main {
+  public static void main(String[] args) {
+    // S1155
+    ArrayList<Integer> x = new ArrayList<>();
+    if (x.size() == 0) {
+      System.out.println("empty");
+    }
+  }
+  public static void test1() {
+    // S1132
+    String myStr = null;
+    // Non-Compliant - will raise a NPE
+    System.out.println("Equal? " + myStr.equals("foo"));
+    // Non-Compliant - null check could be removed
+    System.out.println("Equal? " + (myStr != null && myStr.equals("foo")));
+    // Compliant - properly deals with the null case
+    System.out.println("Equal?" + "foo".equals(myStr));
+  }
+  public static void test2() {
+    // S1596
+    // Noncompliant
+    List<String> collection1 = Collections.EMPTY_LIST;
+    // Noncompliant
+    Map<String, String> collection2 = Collections.EMPTY_MAP;
+    // Noncompliant
+    Set<String> collection3 = Collections.EMPTY_SET;
+  }
+  public static void test3() {
+    // S1125
+    if (booleanMethod() == true) {}
+    if (booleanMethod() == false) {}
+    doSomething(booleanMethod() == true);
+  }
+  public static void test4() {
+    // S2111
+    double d = 1.1;
+    // Noncompliant
+    BigDecimal bd1 = new BigDecimal(d);
+    // Noncompliant
+    BigDecimal bd2 = new BigDecimal(1.1);
+  }
+  public static void test5() {
+    // think about how to merge these into one rewrite
+    ArrayList<Integer> x = new ArrayList<>();
+    if ((x.size() == 20 - 20) == true) {
+      System.out.println("empty");
+    }
+  }
+}
+)";
+
 const char* libpath = "./libprogram.so";
 
 int main() {
     void* handle = nullptr;
     void* render_function = nullptr;
-    state s = {
-        .lines =
-            {
-                "import java.util.ArrayList;",
-                "",
-                "public class Main {",
-                "  public static void main(String[] args) {",
-                "    // S1155",
-                "    ArrayList<Integer> x = new ArrayList<>();",
-                "    if (x.size() == 0) {",
-                "      System.out.println(\"empty\");",
-                "    }",
-                "  }",
-                "  public static void test1() {",
-                "    // S1132",
-                "    String myString = null;",
-                "    // Non-Compliant - will raise a NPE",
-                "    System.out.println(\"Equal? \" + "
-                "myString.equals(\"foo\"));",
-                "    // Non-Compliant - null check could be removed",
-                "    System.out.println(\"Equal? \" + (myString != null && "
-                "myString.equals(\"foo\")));",
-                "    // Compliant - properly deals with the null case",
-                "    System.out.println(\"Equal?\" + "
-                "\"foo\".equals(myString));",
-                "  }",
-                "  public static void test2() {",
-                "    // S1596",
-                "    // Noncompliant",
-                "    List<String> collection1 = Collections.EMPTY_LIST;",
-                "    // Noncompliant",
-                "    Map<String, String> collection2 = Collections.EMPTY_MAP;",
-                "    // Noncompliant",
-                "    Set<String> collection3 = Collections.EMPTY_SET;",
-                "  }",
-                "  public static void test3() {",
-                "    // S1125",
-                "    if (booleanMethod() == true) {}",
-                "    if (booleanMethod() == false) {}",
-                "    doSomething(booleanMethod() == true);",
-                "  }",
-                "  public static void test4() {",
-                "    // S2111",
-                "    double d = 1.1;",
-                "    // Noncompliant",
-                "    BigDecimal bd1 = new BigDecimal(d);",
-                "    // Noncompliant",
-                "    BigDecimal bd2 = new BigDecimal(1.1);",
-                "  }",
-                "  public static void test5() {",
-                "    // think about how to merge these into one rewrite",
-                "    ArrayList<Integer> x = new ArrayList<>();",
-                "    if ((x.size() == 20 - 20) == true) {",
-                "      System.out.println(\"empty\");",
-                "    }",
-                "  }",
-                "}",
-            },
-        .cursor = {0, 0},
-        .show_demo_window = true};
+    state s = {.cursor = {0, 0}, .show_demo_window = false};
+    std::istringstream f(file);
+    std::string line;
+    while (std::getline(f, line)) {
+        s.lines.emplace_back(line);
+    }
     std::string filename = "Example.java";
     window::init();
     bool show_demo_window = true;
