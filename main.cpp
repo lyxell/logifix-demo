@@ -95,13 +95,6 @@ public class Main {
         System.out.println("equal");
     }
   }
-  public static void other() {
-    // TODO think about how to merge these into one rewrite
-    ArrayList<Integer> x = new ArrayList<>();
-    if ((x.size() == 20 - 20) == true) {
-      System.out.println("empty");
-    }
-  }
 }
 )";
 
