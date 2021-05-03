@@ -9,15 +9,22 @@
 static const std::string file = R"(import java.util.ArrayList;
 
 public class Main {
-  public static void main(String[] args) {
-    // S1155
-    ArrayList<Integer> x = new ArrayList<>();
-    if (x.size() == 0) {
-      System.out.println("empty");
-    }
+  public static void s1125() {
+    /**
+     * Boolean literals should not be redundant
+     * https://rules.sonarsource.com/java/RSPEC-1125
+     */
+    if (booleanMethod() == true) {}
+    if (booleanMethod() == false) {}
+    doSomething(booleanMethod() == true);
+    doSomething(booleanMethod() == (1 == 1 && true));
   }
-  public static void test1() {
-    // S1132
+  public static void s1132() {
+    /**
+     * Strings literals should be placed on the left side when checking
+     * for equality
+     * https://rules.sonarsource.com/java/RSPEC-1132
+     */
     String myStr = null;
     // Non-Compliant - will raise a NPE
     System.out.println("Equal? " + myStr.equals("foo"));
@@ -26,31 +33,41 @@ public class Main {
     // Compliant - properly deals with the null case
     System.out.println("Equal?" + "foo".equals(myStr));
   }
-  public static void test2() {
-    // S1596
-    // Noncompliant
+  public static void s1155() {
+    /**
+     * Collection.isEmpty() should be used to test for emptiness
+     * https://rules.sonarsource.com/java/RSPEC-1155
+     */
+    ArrayList<Integer> x = new ArrayList<>();
+    if (x.size() == 0) {
+      System.out.println("empty");
+    }
+    if (30 - 5 * 5 - 5 == x.size()) {
+      System.out.println("empty");
+    }
+  }
+  public static void s1596() {
+    /**
+     * "Collections.EMPTY_LIST", "EMPTY_MAP", and "EMPTY_SET" should not be used
+     * https://rules.sonarsource.com/java/RSPEC-1596
+     */
     List<String> collection1 = Collections.EMPTY_LIST;
-    // Noncompliant
     Map<String, String> collection2 = Collections.EMPTY_MAP;
-    // Noncompliant
     Set<String> collection3 = Collections.EMPTY_SET;
   }
-  public static void test3() {
-    // S1125
-    if (booleanMethod() == true) {}
-    if (booleanMethod() == false) {}
-    doSomething(booleanMethod() == true);
-  }
-  public static void test4() {
-    // S2111
+  public static void s2111() {
+    /**
+     * BigDecimal(double) should not be used
+     * https://rules.sonarsource.com/java/RSPEC-2111
+     */
     double d = 1.1;
-    // Noncompliant
+    float f = 1.1f;
     BigDecimal bd1 = new BigDecimal(d);
-    // Noncompliant
-    BigDecimal bd2 = new BigDecimal(1.1);
+    BigDecimal bd2 = new BigDecimal(f);
+    BigDecimal bd3 = new BigDecimal(1.1);
   }
-  public static void test5() {
-    // think about how to merge these into one rewrite
+  public static void other() {
+    // TODO think about how to merge these into one rewrite
     ArrayList<Integer> x = new ArrayList<>();
     if ((x.size() == 20 - 20) == true) {
       System.out.println("empty");
