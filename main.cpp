@@ -7,6 +7,7 @@
 #include <iostream>
 
 static const std::string file = R"(import java.util.ArrayList;
+import java.util.List;
 
 public class Main {
   public static void s1125() {
@@ -65,6 +66,34 @@ public class Main {
     BigDecimal bd1 = new BigDecimal(d);
     BigDecimal bd2 = new BigDecimal(f);
     BigDecimal bd3 = new BigDecimal(1.1);
+  }
+  public static void s2293() {
+    /**
+     * The diamond operator ("<>") should be used
+     * https://rules.sonarsource.com/java/RSPEC-2293
+     */
+    ArrayList<Integer> x = new ArrayList<Integer>();
+    List<String> x = new ArrayList<String>();
+  }
+  public static void s4973() {
+    /**
+     * Strings and Boxed types should be compared using equals()
+     * https://rules.sonarsource.com/java/RSPEC-4973
+     */
+    String firstName = getFirstName();
+    String lastName = getLastName();
+    if (firstName == lastName) {
+        System.out.println("equal");
+    }
+    if (firstName == "test") {
+        System.out.println("equal");
+    }
+    if ("test" == firstName) {
+        System.out.println("equal");
+    }
+    if ("test" == "test") {
+        System.out.println("equal");
+    }
   }
   public static void other() {
     // TODO think about how to merge these into one rewrite
