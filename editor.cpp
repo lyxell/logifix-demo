@@ -12,6 +12,7 @@ static const auto HIGHLIGHT_COLOR_HOVERED = IM_COL32(255, 224, 120, 255);
 static const auto HIGHLIGHT_COLOR_CLICKED = IM_COL32(255, 212, 69, 255);
 static const auto HIGHLIGHT_PADDING = ImVec2(2.0f, 1.0f);
 static const auto HIGHLIGHT_ROUNDING = 2.0f;
+static const auto SCROLL_OFFSET = 0.5f;
 
 void ui::editor::handle_keypress(state* s) {
     auto& lines = s->lines;
@@ -154,7 +155,7 @@ static void render_line(state* s, std::string& line, int& x, int& y,
         drawList->AddRectFilled(vstart, vend, IM_COL32(0, 0, 0, 255));
         if (s->set_scroll_to_cursor) {
             if (!ImGui::IsRectVisible(vstart, vend)) {
-                ImGui::SetScrollHereY(0.5f);
+                ImGui::SetScrollHereY(SCROLL_OFFSET);
             }
             s->set_scroll_to_cursor = false;
         }
