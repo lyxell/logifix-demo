@@ -3,7 +3,7 @@ DATALOG_REPAIR_ARCHIVE=datalog-repair/datalog-repair.a
 
 OBJS = editor.o dockspace.o main.o ast.o program.o
 
-LIBS = -lm
+LIBS = -lm -lpthread
 UNAME_S := $(shell uname -s)
 CXXFLAGS = -std=c++17 -fPIC -O2 -g
 CXXFLAGS += -Iimgui-boilerplate/imgui

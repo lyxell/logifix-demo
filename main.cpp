@@ -3,11 +3,14 @@
 #include "imgui-boilerplate/window.h"
 #include "imgui.h"
 #include "state.h"
+#include <thread>
 #include <dlfcn.h>
 #include <iostream>
 
 static const std::string file = R"(import java.util.ArrayList;
 import java.util.List;
+import java.math.BigDecimal;
+import java.math.MathContext;
 
 public class Main {
   public static void s1125() {
@@ -61,11 +64,38 @@ public class Main {
      * BigDecimal(double) should not be used
      * https://rules.sonarsource.com/java/RSPEC-2111
      */
+    MathContext mc;
     double d = 1.1;
     float f = 1.1f;
     BigDecimal bd1 = new BigDecimal(d);
     BigDecimal bd2 = new BigDecimal(f);
     BigDecimal bd3 = new BigDecimal(1.1);
+    BigDecimal bd3 = new BigDecimal(1.1f);
+    BigDecimal bd4 = new BigDecimal(d, mc);
+    BigDecimal bd5 = new BigDecimal(f, mc);
+    BigDecimal bd6 = new BigDecimal(1.1, mc);
+    BigDecimal bd6 = new BigDecimal(1.1f, mc);
+  }
+  public static void s2204() {
+    /**
+     * .equals() should not be used to test the values of "Atomic" classes
+     * https://rules.sonarsource.com/java/RSPEC-2204
+     */
+    AtomicInteger aInt1 = new AtomicInteger(0);
+    AtomicInteger aInt2 = new AtomicInteger(0);
+    if (aInt1.equals(aInt2)) {
+        System.out.println("equals");
+    }
+    AtomicLong aLong1 = new AtomicLong(0);
+    AtomicLong aLong2 = new AtomicLong(0);
+    if (aLong1.equals(aLong2)) {
+        System.out.println("equals");
+    }
+    AtomicBoolean aBoolean1 = new AtomicBoolean(0);
+    AtomicBoolean aBoolean2 = new AtomicBoolean(0);
+    if (aBoolean1.equals(aBoolean2)) {
+        System.out.println("equals");
+    }
   }
   public static void s2293() {
     /**
@@ -74,6 +104,13 @@ public class Main {
      */
     ArrayList<Integer> x = new ArrayList<Integer>();
     List<String> x = new ArrayList<String>();
+  }
+  public static void s3984() {
+    /**
+     * Exceptions should not be created without being thrown
+     * https://rules.sonarsource.com/java/RSPEC-3984
+     */
+    new IllegalArgumentException("x must be nonnegative");
   }
   public static void s4973() {
     /**
@@ -96,6 +133,264 @@ public class Main {
     }
   }
 }
+
+// Test for rule s4973 (from Sorald)
+public class CompareStringsBoxedTypesWithEquals {
+
+    // Test from https://rules.sonarsource.com/java/type/Bug/RSPEC-4973
+    public void main(String[] args) {
+        String firstName = getFirstName(); // String overrides equals
+        String lastName = getLastName();
+
+        if (firstName == lastName) { } ; // Noncompliant; false even if the strings have the same value
+    }
+
+    // Aditional tests
+    boolean eq = true;
+
+    // Java implicitly converts one variable to primitive if something boxed and primitive is compared.
+    private void mixedCompare() {
+        int e = 4;
+        Integer f = 4;
+        eq = (e != f); // Compliant;
+        eq = (f == e); // Compliant;
+    }
+
+    // Integer is not primitive and should use .equals()
+    private boolean IntegerCompare() {
+        Integer a = 5;
+        Integer b = 5;
+        return b != a; // Noncompliant
+    }
+
+    // Int is primitive and can use ==
+    private void intCompare() {
+        int x = 5;
+        int y = 5;
+        eq = (x == y); // Compliant;
+        eq = (y == x); // Compliant;
+    }
+
+    // Null comparisons are excluded from transformation
+    private void nullCompare() {
+        String x = null;
+        eq = (x == null); // Compliant
+        eq = (null == x); // Compliant
+    }
+
+    enum foo {
+        BAR,
+        XOR
+    }
+
+    // ENUM comparisons are excluded from transformation
+    private void nullCompare2() {
+        foo x = foo.BAR;
+        eq = (x == foo.BAR); // Compliant
+        eq = (foo.XOR == x); // Compliant
+    }
+
+    // String is not primitive and should use .equals()
+    private boolean stringCompare() {
+        String firstName = getFirstName(); // String overrides equals
+        String lastName = getLastName();
+        if (firstName == lastName) { // Noncompliant
+            return true;
+        }
+        return false;
+    }
+
+    // Object comparison should not be converted
+    private void objectCompare() {
+        Object a = 1;
+        Object b = 1;
+        eq = a == b; // Compliant
+        Integer x = 2;
+        eq = a == x; // Compliant
+    }
+
+    private String getFirstName(){
+        return new String("John");
+    }
+
+    private String getLastName(){
+        return new String("John");
+    }
+
+}
+
+// Test for rule s2111 (from Sorald)
+public class BigDecimalDoubleConstructor {
+
+    // Tests from https://rules.sonarsource.com/java/type/Bug/RSPEC-2111
+    public void main(String[] args) {
+        double d = 1.1;
+        BigDecimal bd1 = new BigDecimal(d); // Noncompliant; see comment above
+        BigDecimal bd2 = new BigDecimal(1.1); // Noncompliant; same result
+    }
+
+    // Tests from https://github.com/SonarSource/sonar-java/blob/master/java-checks-test-sources/src/main/java/checks/BigDecimalDoubleConstructorCheck.java
+    public void main2(String[] args) {
+        MathContext mc = null;
+        BigDecimal bd1 = new BigDecimal("1");
+        BigDecimal bd2 = new BigDecimal(2.0); // Noncompliant {{Use "BigDecimal.valueOf" instead.}}
+        BigDecimal bd4 = new BigDecimal(2.0, mc); // Noncompliant {{Use "BigDecimal.valueOf" instead.}}
+        BigDecimal bd5 = new BigDecimal(2.0f); // Noncompliant {{Use "BigDecimal.valueOf" instead.}}
+        BigDecimal bd6 = new BigDecimal(2.0f, mc); // Noncompliant {{Use "BigDecimal.valueOf" instead.}}
+        BigDecimal bd3 = BigDecimal.valueOf(2.0);
+    }
+
+    // Aditional tests
+    public void foo(String[] args) {
+        double d = 1.1;
+        float f = 2.2f;
+        float f1 = 2f;
+        BigDecimal bd3 = new BigDecimal(f); // Noncompliant
+        BigDecimal bd4 = new BigDecimal(f1); // Noncompliant
+        BigDecimal bd5 = BigDecimal.valueOf(d); // Compliant
+        BigDecimal bd6 = new BigDecimal("1.1"); // Compliant; using String constructor will result in precise value
+        BigDecimal bd7 = BigDecimal.valueOf(f); // Compliant
+        BigDecimal bd8 = BigDecimal.valueOf(f1); // Compliant
+    }
+
+}
+
+public class Test {
+    // default accessor to enable unit tests without requiring reflection
+    static Map<String, String> convertCommandLineArgs(
+            Map<String, String> rawArgs) {
+        final HashMap<String, String> props = new HashMap<String, String>();
+        boolean errorArg = false;
+        for (Entry<String, String> arg : rawArgs.entrySet()) {
+            if (arg.getKey().length() == 1 || arg.getKey().startsWith("D")) {
+                String value = arg.getValue();
+                switch (arg.getKey().charAt(0)) {
+                    case 'j':
+                        // Noncompliant S4973
+                        if (value == arg.getKey()) {
+                            errorArg("-j", "Missing host:port value");
+                            errorArg = true;
+                            continue;
+                        }
+                        props.put(PROP_CONTROL_SOCKET, value);
+                        break;
+                    case 'l':
+                        // Noncompliant S4973
+                        if (value == arg.getKey()) {
+                            errorArg("-l", "Missing log level value");
+                            errorArg = true;
+                            continue;
+                        }
+                        props.put(PROP_LOG_LEVEL, value);
+                        break;
+                    case 'f':
+                        // Noncompliant S4973
+                        if (value == arg.getKey()) {
+                            errorArg("-f", "Missing log file value");
+                            errorArg = true;
+                            continue;
+                        } else if ("-".equals(value)) {
+                            value = "";
+                        }
+                        props.put(PROP_LOG_FILE, value);
+                        break;
+                    case 'c':
+                        // Noncompliant S4973
+                        if (value == arg.getKey()) {
+                            errorArg("-c", "Missing directory value");
+                            errorArg = true;
+                            continue;
+                        }
+                        props.put(SharedConstants.SLING_HOME, value);
+                        break;
+                    case 'i':
+                        // Noncompliant S4973
+                        if (value == arg.getKey()) {
+                            errorArg("-i", "Missing launchpad directory value");
+                            errorArg = true;
+                            continue;
+                        }
+                        props.put(SharedConstants.SLING_LAUNCHPAD, value);
+                        break;
+                    case 'a':
+                        // Noncompliant S4973
+                        if (value == arg.getKey()) {
+                            errorArg("-a", "Missing address value");
+                            errorArg = true;
+                            continue;
+                        }
+                        props.put(PROP_HOST, value);
+                        break;
+                    case 'p':
+                        // Noncompliant S4973
+                        if (value == arg.getKey()) {
+                            errorArg("-p", "Missing port value");
+                            errorArg = true;
+                            continue;
+                        }
+                        try {
+                            // just to verify it is a number
+                            Integer.parseInt(value);
+                            props.put(PROP_PORT, value);
+                        } catch (RuntimeException e) {
+                            errorArg("-p", "Bad port: " + value);
+                            errorArg = true;
+                        }
+                        break;
+                    case 'r':
+                        // Noncompliant S4973
+                        if (value == arg.getKey()) {
+                            errorArg("-r", "Missing root path value");
+                            errorArg = true;
+                            continue;
+                        }
+                        props.put(PROP_CONTEXT_PATH, value);
+                        break;
+                    case 'n':
+                        props.put(PROP_SHUTDOWN_HOOK, Boolean.FALSE.toString());
+                        break;
+                    case 'D':
+                        // Noncompliant S4973
+                        if (value == arg.getKey()) {
+                            errorArg("-D", "Missing property assignment");
+                            errorArg = true;
+                            continue;
+                        }
+                        if (arg.getKey().length() > 1) {
+                            //Dfoo=bar arg.key=Dfoo and arg.value=bar
+                            props.put(arg.getKey().substring(1), arg.getValue());
+                        } else {
+                            //D foo=bar arg.key=D and arg.value=foo=bar
+                            String[] parts = value.split("=");
+                            int valueIdx = (parts.length > 1) ? 1 : 0;
+                            props.put(parts[0], parts[valueIdx]);
+                        }
+                        break;
+                    default:
+                        errorArg("-" + arg.getKey(), "Unrecognized option");
+                        errorArg = true;
+                        break;
+                }
+            } else if ("start".equals(arg.getKey())
+                    || "stop".equals(arg.getKey())
+                    || "status".equals(arg.getKey())
+                    || "threads".equals(arg.getKey())) {
+                props.put(PROP_CONTROL_ACTION, arg.getValue());
+            } else {
+                errorArg(arg.getKey(), "Unrecognized option");
+                errorArg = true;
+            }
+        }
+        return errorArg ? null : props;
+    }
+    @Override
+    protected ElementFrame<Node, Node> getChildFrame() {
+        // Noncompliant 2293
+        return new ElementFrame<Node, Node>(getCurrentFrame().currentChild,
+                                getCurrentFrame());
+    }
+}
+
 )";
 
 const char* libpath = "./libprogram.so";
@@ -145,7 +440,11 @@ int main() {
         s.keyboard_input = window::keyboard_input;
         s.text_input = window::text_input;
         ui::dockspace::render();
-        ui::editor::render(&s);
+
+        {
+            const std::lock_guard<std::mutex> lock(s.mutex);
+            ui::editor::render(&s);
+        }
 
         size_t buffer_position = 0;
         for (int i = 0; i < s.cursor.second; i++) {
@@ -155,6 +454,7 @@ int main() {
             std::min(s.cursor.first, int(s.lines[s.cursor.second].size()));
 
         if (!s.ast.expired()) {
+            const std::lock_guard<std::mutex> lock(s.mutex);
             ui::ast::render("Test", s.ast.lock(), buffer_position);
         } else {
             ui::ast::render("Test", nullptr, buffer_position);
@@ -163,9 +463,10 @@ int main() {
             ImGui::ShowDemoWindow();
         }
         if (render_function != nullptr && s.dirty) {
-            std::cout << "calling function" << std::endl;
-            reinterpret_cast<void (*)(state*)>(render_function)(&s);
             s.dirty = false;
+            auto fn = reinterpret_cast<void (*)(state*)>(render_function);
+            std::thread t(fn, &s);
+            t.detach();
         }
         window::text_input = {};
         window::end_frame();

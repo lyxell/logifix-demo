@@ -154,7 +154,7 @@ static void render_line(state* s, std::string& line, int& x, int& y,
         ImVec2 vend(pos.x + 1.0f, pos.y + ImGui::GetTextLineHeight());
         drawList->AddRectFilled(vstart, vend, IM_COL32(0, 0, 0, 255));
         if (s->set_scroll_to_cursor) {
-            if (!ImGui::IsRectVisible(vstart, vend)) {
+            if (!ImGui::IsRectVisible(ImVec2(0.0f, vstart.y), vend)) {
                 ImGui::SetScrollHereY(SCROLL_OFFSET);
             }
             s->set_scroll_to_cursor = false;
