@@ -91,6 +91,19 @@ static std::optional<std::pair<int, int>> intersection(std::pair<int, int> a,
     return std::pair(b.first, std::min(a.second, b.second));
 }
 
+static void TextWithBackground(ImU32 color, const char* str) {
+    auto* drawList = ImGui::GetWindowDrawList();
+    auto rect_upper_left = ImGui::GetCursorScreenPos() -
+            HIGHLIGHT_PADDING;
+    auto rect_lower_right = rect_upper_left +
+                            ImGui::CalcTextSize(str) +
+            HIGHLIGHT_PADDING;
+
+    drawList->AddRectFilled(rect_upper_left, rect_lower_right, color,
+                            HIGHLIGHT_ROUNDING);
+    ImGui::Text("%s", str);
+}
+
 static void render_line(state* s, std::string& line, int& x, int& y,
                         int buf_pos, int row) {
     auto* drawList = ImGui::GetWindowDrawList();
@@ -116,25 +129,43 @@ static void render_line(state* s, std::string& line, int& x, int& y,
         auto rect_lower_right = rect_upper_left +
                                 ImGui::CalcTextSize(str.c_str()) +
                                 HIGHLIGHT_PADDING;
+        auto rect_lower_left = ImVec2(rect_upper_left.x, rect_lower_right.y);
         auto hovered =
             ImGui::IsMouseHoveringRect(rect_upper_left, rect_lower_right);
         auto color = HIGHLIGHT_COLOR;
         auto clicked = hovered && ImGui::IsMouseDown(0);
         auto double_clicked = hovered && ImGui::IsMouseDoubleClicked(0);
+
+        float value = 0.0f;
+
+        ImGui::SetNextWindowPos(rect_lower_left + ImVec2(0.0f, 5.0f), ImGuiCond_Appearing);
+        ImGui::SetNextWindowSize(ImVec2(350, 200), ImGuiCond_Appearing);
+        if (ImGui::BeginPopupModal(("repairpopup#" + std::to_string(row)).c_str()))
+        {
+            ImGui::Text("S1149");
+            ImGui::Separator();
+            ImGui::Text("Fix available", std::get<2>(selection).c_str());
+            TextWithBackground(IM_COL32(253, 184, 192, 255),
+                    ("- " + str).c_str());
+            TextWithBackground(IM_COL32(172, 242, 189, 255),
+                    ("+ " + std::get<2>(selection)).c_str());
+
+            if (ImGui::Button("OK", ImVec2(120, 0))) { ImGui::CloseCurrentPopup(); }
+            ImGui::SetItemDefaultFocus();
+            ImGui::SameLine();
+            if (ImGui::Button("Cancel", ImVec2(120, 0))) { ImGui::CloseCurrentPopup(); }
+            ImGui::EndPopup();
+        }
         if (hovered) {
             color = HIGHLIGHT_COLOR_HOVERED;
         }
         if (clicked) {
             color = HIGHLIGHT_COLOR_CLICKED;
+            ImGui::OpenPopup(("repairpopup#" + std::to_string(row)).c_str());
         }
         drawList->AddRectFilled(rect_upper_left, rect_lower_right, color,
                                 HIGHLIGHT_ROUNDING);
-        if (hovered) {
-            ImGui::BeginTooltip();
-            ImGui::Text("Double-click to rewrite to %s",
-                        std::get<2>(selection).c_str());
-            ImGui::EndTooltip();
-        }
+        /*
         if (double_clicked) {
             auto change = std::get<2>(selection);
             std::string new_string = line.substr(0, str_start);
@@ -144,7 +175,7 @@ static void render_line(state* s, std::string& line, int& x, int& y,
             new_string += line.substr(str_end);
             line = std::move(new_string);
             s->dirty = true;
-        }
+        }*/
     }
     // render cursor
     if (row - 1 == y) {

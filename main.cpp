@@ -209,11 +209,11 @@ public class CompareStringsBoxedTypesWithEquals {
         eq = a == x; // Compliant
     }
 
-    private String getFirstName(){
+    private String getFirstName() {
         return new String("John");
     }
 
-    private String getLastName(){
+    private String getLastName() {
         return new String("John");
     }
 
@@ -398,7 +398,7 @@ const char* libpath = "./libprogram.so";
 int main() {
     void* handle = nullptr;
     void* render_function = nullptr;
-    state s = {.cursor = {0, 0}, .show_demo_window = false};
+    state s = {.cursor = {0, 0}, .show_demo_window = true};
     std::istringstream f(file);
     std::string line;
     while (std::getline(f, line)) {
@@ -406,7 +406,6 @@ int main() {
     }
     std::string filename = "Example.java";
     window::init();
-    bool show_demo_window = true;
     while (!window::is_exiting()) {
         struct stat attr;
         if ((stat(libpath, &attr) == 0) && (s.inode != attr.st_ino)) {
