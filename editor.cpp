@@ -101,7 +101,6 @@ void ui::editor::render(state* s) {
 
     ImEdit::Begin("test");
 
-    handle_keypress(s);
     for (auto& line : s->lines) {
         ImEdit::Line(line.c_str());
     }
@@ -115,7 +114,7 @@ void ui::editor::render(state* s) {
                 {start, end}, {buffer_pos, buffer_pos + line.size()});
             if (!intersection)
                 continue;
-            ImEdit::Highlight(row, start - buffer_pos, end - buffer_pos, []() {
+            ImEdit::Highlight(row, intersection->first - buffer_pos, intersection->second - buffer_pos, []() {
                 std::cout << "clicked" << std::endl;
                 ImGui::OpenPopup("Stacked 1");
             });
@@ -131,6 +130,8 @@ void ui::editor::render(state* s) {
         TextWithBackground(IM_COL32(172, 242, 189, 255), "+ hello");
         ImGui::EndPopup();
     }
+
+    handle_keypress(s);
 
     ImGui::End();
 }
