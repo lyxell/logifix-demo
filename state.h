@@ -2,12 +2,12 @@
 
 #include "ast.h"
 #include <SDL.h>
+#include <mutex>
 #include <queue>
 #include <string>
 #include <sys/stat.h>
 #include <utility>
 #include <vector>
-#include <mutex>
 
 struct state {
 
@@ -21,6 +21,5 @@ struct state {
     std::queue<SDL_Keysym> keyboard_input;
     std::string text_input;
     bool dirty;
-    bool set_scroll_to_cursor;
     std::mutex mutex;
 };

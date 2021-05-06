@@ -25,7 +25,8 @@ void run(state* s) {
         auto [ai, bi, ci] = repairs[i];
         bool contained = false;
         for (size_t j = 0; j < repairs.size(); j++) {
-            if (i == j) continue;
+            if (i == j)
+                continue;
             auto [aj, bj, cj] = repairs[j];
             if ((aj < ai && bj >= bi) || (aj <= ai && bj > bi)) {
                 contained = true;
@@ -45,6 +46,5 @@ void run(state* s) {
         s->ast = p;
         s->repairs = filtered_repairs;
     }
-
 }
 }

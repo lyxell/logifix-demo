@@ -3,9 +3,9 @@
 #include "imgui-boilerplate/window.h"
 #include "imgui.h"
 #include "state.h"
-#include <thread>
 #include <dlfcn.h>
 #include <iostream>
+#include <thread>
 
 static const std::string file = R"(import java.util.ArrayList;
 import java.util.List;
