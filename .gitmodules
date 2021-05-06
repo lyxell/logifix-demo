@@ -4,3 +4,6 @@
 [submodule "datalog-repair"]
 	path = datalog-repair
 	url = https://github.com/lyxell/datalog-repair.git
+[submodule "imedit"]
+	path = imedit
+	url = https://github.com/lyxell/imedit.git

@@ -2,17 +2,11 @@
 #include "imgui.h"
 #define IMGUI_DEFINE_MATH_OPERATORS
 #include "imgui_internal.h"
+#include "imedit/imedit.h"
 #include <cstdlib>
 #include <iostream>
 #include <optional>
 #include <tuple>
-
-static const auto HIGHLIGHT_COLOR = IM_COL32(255, 243, 201, 255);
-static const auto HIGHLIGHT_COLOR_HOVERED = IM_COL32(255, 224, 120, 255);
-static const auto HIGHLIGHT_COLOR_CLICKED = IM_COL32(255, 212, 69, 255);
-static const auto HIGHLIGHT_PADDING = ImVec2(2.0f, 1.0f);
-static const auto HIGHLIGHT_ROUNDING = 2.0f;
-static const auto SCROLL_OFFSET = 0.5f;
 
 void ui::editor::handle_keypress(state* s) {
     auto& lines = s->lines;
@@ -79,17 +73,14 @@ void ui::editor::handle_keypress(state* s) {
     }
 }
 
-// returns intersection of two one-dimensional segments [a1,a2), [b1, b2)
-static std::optional<std::pair<int, int>> intersection(std::pair<int, int> a,
-                                                       std::pair<int, int> b) {
-    if (a > b) {
-        std::swap(a, b);
-    }
-    if (a.second <= b.first) {
-        return {};
-    }
-    return std::pair(b.first, std::min(a.second, b.second));
-}
+/*
+
+static const auto HIGHLIGHT_COLOR = IM_COL32(255, 243, 201, 255);
+static const auto HIGHLIGHT_COLOR_HOVERED = IM_COL32(255, 224, 120, 255);
+static const auto HIGHLIGHT_COLOR_CLICKED = IM_COL32(255, 212, 69, 255);
+static const auto HIGHLIGHT_PADDING = ImVec2(2.0f, 1.0f);
+static const auto HIGHLIGHT_ROUNDING = 2.0f;
+static const auto SCROLL_OFFSET = 0.5f;
 
 static void TextWithBackground(ImU32 color, const char* str) {
     auto* drawList = ImGui::GetWindowDrawList();
@@ -102,6 +93,18 @@ static void TextWithBackground(ImU32 color, const char* str) {
     drawList->AddRectFilled(rect_upper_left, rect_lower_right, color,
                             HIGHLIGHT_ROUNDING);
     ImGui::Text("%s", str);
+}
+
+// returns intersection of two one-dimensional segments [a1,a2), [b1, b2)
+static std::optional<std::pair<int, int>> intersection(std::pair<int, int> a,
+                                                       std::pair<int, int> b) {
+    if (a > b) {
+        std::swap(a, b);
+    }
+    if (a.second <= b.first) {
+        return {};
+    }
+    return std::pair(b.first, std::min(a.second, b.second));
 }
 
 static void render_line(state* s, std::string& line, int& x, int& y,
@@ -165,7 +168,6 @@ static void render_line(state* s, std::string& line, int& x, int& y,
         }
         drawList->AddRectFilled(rect_upper_left, rect_lower_right, color,
                                 HIGHLIGHT_ROUNDING);
-        /*
         if (double_clicked) {
             auto change = std::get<2>(selection);
             std::string new_string = line.substr(0, str_start);
@@ -175,7 +177,7 @@ static void render_line(state* s, std::string& line, int& x, int& y,
             new_string += line.substr(str_end);
             line = std::move(new_string);
             s->dirty = true;
-        }*/
+        }
     }
     // render cursor
     if (row - 1 == y) {
@@ -192,28 +194,35 @@ static void render_line(state* s, std::string& line, int& x, int& y,
         }
     }
     ImGui::Text("%s", line.c_str());
-}
+}*/
 
 void ui::editor::render(state* s) {
+
 
     auto& [x, y] = s->cursor;
 
     ImGui::Begin("Editor");
+
+    ImEdit::Begin("test");
+
     handle_keypress(s);
-    const size_t NUM_COLUMNS = 2;
-    static ImGuiTableFlags flags =
-        ImGuiTableFlags_SizingFixedFit | ImGuiTableFlags_Hideable;
-    if (ImGui::BeginTable("Editor#table", NUM_COLUMNS, flags)) {
-        ImGui::TableSetupColumn("Editor#A", ImGuiTableColumnFlags_WidthFixed);
-        ImGui::TableSetupColumn("Editor#B", ImGuiTableColumnFlags_WidthStretch);
-        int row = 1;
-        int buf_pos = 0;
-        for (auto& line : s->lines) {
-            render_line(s, line, x, y, buf_pos, row);
-            row++;
-            buf_pos += line.size() + 1;
-        }
-        ImGui::EndTable();
+    for (auto& line : s->lines) {
+        ImEdit::Line(line.c_str());
     }
+    ImEdit::Cursor(s->cursor.first, s->cursor.second);
+
+    ImEdit::Highlight(1, 0, 5, [](){
+        std::cout << "clicked" << std::endl;
+        ImGui::OpenPopup("Stacked 1");
+    });
+
+    ImEdit::End();
+
+    if (ImGui::BeginPopupModal("Stacked 1")) {
+        ImGui::Text("Hello from modal");
+        ImGui::EndPopup();
+    }
+
     ImGui::End();
+
 }
