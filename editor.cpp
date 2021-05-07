@@ -114,9 +114,9 @@ void ui::editor::render(state* s) {
                 {start, end}, {buffer_pos, buffer_pos + line.size()});
             if (!intersection)
                 continue;
-            ImEdit::Highlight(row, intersection->first - buffer_pos, intersection->second - buffer_pos, []() {
-                std::cout << "clicked" << std::endl;
-                ImGui::OpenPopup("Stacked 1");
+            ImEdit::Highlight(row, intersection->first - buffer_pos, intersection->second - buffer_pos, [replacement]() {
+                std::cout << "clicked " << replacement << std::endl;
+                //ImGui::OpenPopup("Stacked 1");
             });
         }
         buffer_pos += line.size() + 1;

@@ -241,7 +241,7 @@ public class BigDecimalDoubleConstructor {
         BigDecimal bd3 = BigDecimal.valueOf(2.0);
     }
 
-    // Aditional tests
+    // Additional tests
     public void foo(String[] args) {
         double d = 1.1;
         float f = 2.2f;
@@ -392,10 +392,20 @@ public class Test {
     }
 }
 
-public class IteratorNextException implements Iterator {
-    @Override
-    public String next() { // Noncompliant
+public class MyIterator implements Iterator<String> {
+  public String next() {
+    if (!hasNext()) {
+      return null;
     }
+  }
+}
+
+public class MyIterator implements Iterator<String> {
+  public String next() {
+    if (!hasNext()) {
+      throw new NoSuchElementException();
+    }
+  }
 }
 
 )";
