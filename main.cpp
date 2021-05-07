@@ -8,6 +8,7 @@
 #include <thread>
 
 static const std::string file = R"(import java.util.ArrayList;
+import java.util.NoSuchElementException;
 import java.util.List;
 import java.math.BigDecimal;
 import java.math.MathContext;
@@ -388,6 +389,12 @@ public class Test {
         // Noncompliant 2293
         return new ElementFrame<Node, Node>(getCurrentFrame().currentChild,
                                 getCurrentFrame());
+    }
+}
+
+public class IteratorNextException implements Iterator {
+    @Override
+    public String next() { // Noncompliant
     }
 }
 
