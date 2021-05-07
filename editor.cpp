@@ -3,6 +3,7 @@
 #define IMGUI_DEFINE_MATH_OPERATORS
 #include "imedit/imedit.h"
 #include "imgui_internal.h"
+#include "imgui-boilerplate/window.h"
 #include <cstdlib>
 #include <iostream>
 #include <optional>
@@ -93,19 +94,55 @@ find_intersection(std::pair<int, int> a, std::pair<int, int> b) {
     return std::pair(b.first, std::min(a.second, b.second));
 }
 
+void draw_child_window(const char* id) {
+    ImGui::Unindent();
+    ImGui::PushStyleColor(ImGuiCol_ChildBg, IM_COL32(233, 233, 233, 255));
+    ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(20.0f, 20.0f));
+    ImGui::BeginChild(id, ImVec2(ImGui::GetWindowContentRegionWidth(), 150), false, ImGuiWindowFlags_AlwaysUseWindowPadding);
+    window::heading("Remove this unused \"x\" local variable.");
+
+    window::text("Code smell");
+    ImGui::Text("");
+    ImGui::TextColored(ImVec4(0.6f, 0.6f, 0.6f, 1.0f), "- String x = \"hello\", y = \"world\";");
+    ImGui::TextColored(ImVec4(0.0f, 0.0f, 0.0f, 1.0f), "+ String y = \"world\";");
+    ImGui::EndChild();
+    ImGui::PopStyleVar();
+    ImGui::PopStyleColor();
+    ImGui::Indent();
+}
+
 void ui::editor::render(state* s) {
 
     auto& [x, y] = s->cursor;
-
+    ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 12.0f));
+    ImGui::PushStyleVar(ImGuiStyleVar_CellPadding, ImVec2(0.0f, 2.0f));
+    ImGui::PushStyleVar(ImGuiStyleVar_ChildBorderSize, 0.0f);
     ImGui::Begin("Editor");
 
     ImEdit::Begin("test");
+    ImGui::Indent();
 
+    size_t row = 1;
     for (auto& line : s->lines) {
+        if (row == y + 1) {
+            ImEdit::Cursor(x);
+        }
+        if (row == 9) {
+            ImEdit::Underline(15, 16);
+        }
         ImEdit::Line(line.c_str());
+        if (row == 9) {
+            draw_child_window("child_id");
+        }
+        if (row == 13) {
+            draw_child_window("child_id2");
+        }
+        row++;
     }
-    ImEdit::Cursor(s->cursor.first, s->cursor.second);
+    ImGui::Unindent();
 
+
+    /*
     int buffer_pos = 0;
     for (int row = 0; row < s->lines.size(); row++) {
         auto line = s->lines[row];
@@ -120,18 +157,22 @@ void ui::editor::render(state* s) {
             });
         }
         buffer_pos += line.size() + 1;
-    }
+    }*/
 
     ImEdit::End();
 
+    /*
     if (ImGui::BeginPopupModal("Stacked 1")) {
         ImGui::Text("Hello from modal");
         TextWithBackground(IM_COL32(253, 184, 192, 255), "- hello");
         TextWithBackground(IM_COL32(172, 242, 189, 255), "+ hello");
         ImGui::EndPopup();
-    }
+    }*/
 
     handle_keypress(s);
 
     ImGui::End();
+    ImGui::PopStyleVar();
+    ImGui::PopStyleVar();
+    ImGui::PopStyleVar();
 }

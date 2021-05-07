@@ -13,6 +13,13 @@ import java.util.List;
 import java.math.BigDecimal;
 import java.math.MathContext;
 
+public class Test {
+    public static void main(String[] args) {
+        String x = "hello", y = "world";
+        System.out.println(y);
+    }
+}
+
 public class Main {
   public static void s1125() {
     /**
