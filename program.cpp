@@ -45,6 +45,7 @@ void run(state* s) {
         const std::lock_guard<std::mutex> lock(s->mutex);
         s->ast = p;
         s->repairs = filtered_repairs;
+        s->variables_in_scope = rep.get_variables_in_scope(filename);
     }
 }
 }

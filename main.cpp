@@ -70,11 +70,11 @@ public class Main {
     BigDecimal bd1 = new BigDecimal(d);
     BigDecimal bd2 = new BigDecimal(f);
     BigDecimal bd3 = new BigDecimal(1.1);
-    BigDecimal bd3 = new BigDecimal(1.1f);
-    BigDecimal bd4 = new BigDecimal(d, mc);
-    BigDecimal bd5 = new BigDecimal(f, mc);
-    BigDecimal bd6 = new BigDecimal(1.1, mc);
-    BigDecimal bd6 = new BigDecimal(1.1f, mc);
+    BigDecimal bd4 = new BigDecimal(1.1f);
+    BigDecimal bd5 = new BigDecimal(d, mc);
+    BigDecimal bd6 = new BigDecimal(f, mc);
+    BigDecimal bd7 = new BigDecimal(1.1, mc);
+    BigDecimal bd8 = new BigDecimal(1.1f, mc);
   }
   public static void s2204() {
     /**
@@ -103,7 +103,7 @@ public class Main {
      * https://rules.sonarsource.com/java/RSPEC-2293
      */
     ArrayList<Integer> x = new ArrayList<Integer>();
-    List<String> x = new ArrayList<String>();
+    List<String> y = new ArrayList<String>();
   }
   public static void s3984() {
     /**
@@ -398,7 +398,7 @@ const char* libpath = "./libprogram.so";
 int main() {
     void* handle = nullptr;
     void* render_function = nullptr;
-    state s = {.cursor = {0, 0}, .show_demo_window = true};
+    state s = {.cursor = {0, 0}, .show_demo_window = false};
     std::istringstream f(file);
     std::string line;
     while (std::getline(f, line)) {
@@ -458,6 +458,22 @@ int main() {
         } else {
             ui::ast::render("Test", nullptr, buffer_position);
         }
+
+        {
+            const std::lock_guard<std::mutex> lock(s.mutex);
+            ImGui::Begin("Variables in scope");
+            std::set<std::pair<std::string,std::string>> vars;
+            for (auto [v, type, a, b] : s.variables_in_scope) {
+                if (a <= buffer_position && b >= buffer_position) {
+                    vars.emplace(v, type);
+                }
+            }
+            for (auto [v, type] : vars) {
+                ImGui::Text("%s %s", v.c_str(), type.c_str());
+            }
+            ImGui::End();
+        }
+
         if (s.show_demo_window) {
             ImGui::ShowDemoWindow();
         }
