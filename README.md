@@ -9,6 +9,7 @@
 * [S1155 - Collection.isEmpty() should be used to test for emptiness](https://github.com/lyxell/datalog-repair/blob/master/rules/1155.dl)
 * [S1596 - Collections.EMPTY_LIST, EMPTY_MAP, and EMPTY_SET should not be used](https://github.com/lyxell/datalog-repair/blob/master/rules/1596.dl)
 * [S2111 - BigDecimal(double) should not be used](https://github.com/lyxell/datalog-repair/blob/master/rules/2111.dl)
+* [S2204 - .equals() should not be used to test the values of Atomic classes](https://github.com/lyxell/datalog-repair/blob/master/rules/2204.dl)
 * [S2293 - The diamond operator ("<>") should be used](https://github.com/lyxell/datalog-repair/blob/master/rules/2293.dl)
 * [S4973 - Strings and Boxed types should be compared using equals()](https://github.com/lyxell/datalog-repair/blob/master/rules/4973.dl)
 
