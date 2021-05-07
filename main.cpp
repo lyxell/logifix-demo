@@ -398,7 +398,7 @@ const char* libpath = "./libprogram.so";
 int main() {
     void* handle = nullptr;
     void* render_function = nullptr;
-    state s = {.cursor = {0, 0}, .show_demo_window = false};
+    state s = {.cursor = {0, 0}, .show_demo_window = true};
     std::istringstream f(file);
     std::string line;
     while (std::getline(f, line)) {
@@ -468,8 +468,18 @@ int main() {
                     vars.emplace(v, type);
                 }
             }
-            for (auto [v, type] : vars) {
-                ImGui::Text("%s %s", v.c_str(), type.c_str());
+            if (ImGui::BeginTable("Declared variables", 2)) {
+                ImGui::TableSetupColumn("Variable name");
+                ImGui::TableSetupColumn("Type");
+                ImGui::TableHeadersRow();
+                for (auto [v, type] : vars) {
+                    ImGui::TableNextRow();
+                    ImGui::TableNextColumn();
+                    ImGui::Text("%s", v.c_str());
+                    ImGui::TableNextColumn();
+                    ImGui::Text("%s", type.c_str());
+                }
+                ImGui::EndTable();
             }
             ImGui::End();
         }
