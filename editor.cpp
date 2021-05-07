@@ -9,6 +9,9 @@
 #include <optional>
 #include <tuple>
 
+static const auto REPAIR_WINDOW_PADDING = ImVec2(32.0f, 16.0f);
+static const auto REPAIR_WINDOW_HEIGHT = 130.0f;
+
 void ui::editor::handle_keypress(state* s) {
     auto& lines = s->lines;
     auto& [x, y] = s->cursor;
@@ -96,9 +99,9 @@ find_intersection(std::pair<int, int> a, std::pair<int, int> b) {
 
 void draw_child_window(const char* id) {
     ImGui::Unindent();
-    ImGui::PushStyleColor(ImGuiCol_ChildBg, IM_COL32(233, 233, 233, 255));
-    ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(20.0f, 20.0f));
-    ImGui::BeginChild(id, ImVec2(ImGui::GetWindowContentRegionWidth(), 150), false, ImGuiWindowFlags_AlwaysUseWindowPadding);
+    ImGui::PushStyleColor(ImGuiCol_ChildBg, IM_COL32(240, 240, 240, 255));
+    ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, REPAIR_WINDOW_PADDING);
+    ImGui::BeginChild(id, ImVec2(ImGui::GetWindowContentRegionWidth(), REPAIR_WINDOW_HEIGHT), false, ImGuiWindowFlags_AlwaysUseWindowPadding);
     window::heading("Remove this unused \"x\" local variable.");
 
     window::text("Code smell");
@@ -123,51 +126,39 @@ void ui::editor::render(state* s) {
     ImGui::Indent();
 
     size_t row = 1;
+    size_t buffer_pos = 0;
     for (auto& line : s->lines) {
+
+        for (auto [start, end, replacement] : s->repairs) {
+            auto intersection = find_intersection(
+                {start, end}, {buffer_pos, buffer_pos + line.size()});
+            if (!intersection) continue;
+            ImEdit::Underline(intersection->first - buffer_pos, intersection->second - buffer_pos);
+        }
+
         if (row == y + 1) {
             ImEdit::Cursor(x);
         }
+
         if (row == 9) {
             ImEdit::Underline(15, 16);
         }
         ImEdit::Line(line.c_str());
-        if (row == 9) {
-            draw_child_window("child_id");
-        }
-        if (row == 13) {
-            draw_child_window("child_id2");
-        }
-        row++;
-    }
-    ImGui::Unindent();
 
-
-    /*
-    int buffer_pos = 0;
-    for (int row = 0; row < s->lines.size(); row++) {
-        auto line = s->lines[row];
         for (auto [start, end, replacement] : s->repairs) {
             auto intersection = find_intersection(
                 {start, end}, {buffer_pos, buffer_pos + line.size()});
-            if (!intersection)
-                continue;
-            ImEdit::Highlight(row, intersection->first - buffer_pos, intersection->second - buffer_pos, [replacement]() {
-                std::cout << "clicked " << replacement << std::endl;
-                //ImGui::OpenPopup("Stacked 1");
-            });
+            if (!intersection) continue;
+            if (end > buffer_pos + line.size()) continue;
+            draw_child_window(("child_id2" + std::to_string(row)).c_str());
         }
+
+        row++;
         buffer_pos += line.size() + 1;
-    }*/
+    }
 
+    ImGui::Unindent();
     ImEdit::End();
-
-    /*
-    if (ImGui::BeginPopupModal("Stacked 1")) {
-        ImGui::Text("Hello from modal");
-        TextWithBackground(IM_COL32(253, 184, 192, 255), "- hello");
-        TextWithBackground(IM_COL32(172, 242, 189, 255), "+ hello");
-        ImGui::EndPopup();
-    }*/
 
     handle_keypress(s);
 
