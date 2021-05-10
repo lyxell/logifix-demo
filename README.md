@@ -6,11 +6,11 @@ automatic repair of SonarQube static analysis violations.
 
 ![](https://i.imgur.com/KJDHi5n.gif)
 
-## Building
+### Building the demo
 
-### Debian/Ubuntu
+#### Debian/Ubuntu
 
-#### Step 1 (Install Soufflé)
+##### Step 1 (Install Soufflé)
 
 Building might take ~15 minutes to complete.
 
@@ -41,7 +41,7 @@ sudo apt install -y \
 make
 ```
 
-#### Step 2 (Building)
+##### Step 2 (Building)
 
 ```bash
 # Dependencies
@@ -54,7 +54,7 @@ export SOUFFLE_PATH=/path/to/where/you/built/souffle
 make
 ```
 
-## Usage
+### Usage
 
 **Using the user interface**
 
