@@ -1,5 +1,5 @@
 #pragma once
-#include "datalog-repair/repair.h"
+#include "squarelog/repair.h"
 #include <string>
 
 namespace ui::ast {

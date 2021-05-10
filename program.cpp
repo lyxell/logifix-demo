@@ -1,4 +1,4 @@
-#include "datalog-repair/repair.h"
+#include "squarelog/repair.h"
 #include "state.h"
 #include <iostream>
 
