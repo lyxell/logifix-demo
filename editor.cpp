@@ -140,9 +140,6 @@ void ui::editor::render(state* s) {
             ImEdit::Cursor(x);
         }
 
-        if (row == 9) {
-            ImEdit::Underline(15, 16);
-        }
         ImEdit::Line(line.c_str());
 
         for (auto [start, end, replacement, message] : s->repairs) {
