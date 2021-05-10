@@ -22,18 +22,18 @@ void run(state* s) {
     // temporary way to not include overlapping repairs
     decltype(repairs) filtered_repairs;
     for (size_t i = 0; i < repairs.size(); i++) {
-        auto [ai, bi, ci] = repairs[i];
+        auto [ai, bi, ci, di] = repairs[i];
         bool contained = false;
         for (size_t j = 0; j < repairs.size(); j++) {
             if (i == j)
                 continue;
-            auto [aj, bj, cj] = repairs[j];
+            auto [aj, bj, cj, dj] = repairs[j];
             if ((aj < ai && bj >= bi) || (aj <= ai && bj > bi)) {
                 contained = true;
             }
         }
         if (!contained) {
-            filtered_repairs.emplace_back(ai, bi, ci);
+            filtered_repairs.emplace_back(ai, bi, ci, di);
         }
     }
     auto p = rep.get_ast(filename);

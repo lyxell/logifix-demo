@@ -9,8 +9,8 @@
 #include <optional>
 #include <tuple>
 
-static const auto REPAIR_WINDOW_PADDING = ImVec2(32.0f, 16.0f);
-static const auto REPAIR_WINDOW_HEIGHT = 130.0f;
+static const auto REPAIR_WINDOW_PADDING = ImVec2(32.0f, 24.0f);
+static const auto REPAIR_WINDOW_HEIGHT = 160.0f;
 
 void ui::editor::handle_keypress(state* s) {
     auto& lines = s->lines;
@@ -97,17 +97,17 @@ find_intersection(std::pair<int, int> a, std::pair<int, int> b) {
     return std::pair(b.first, std::min(a.second, b.second));
 }
 
-void draw_child_window(const char* id) {
+void draw_child_window(const char* id, const char* message, const char* removed, const char* added) {
     ImGui::Unindent();
     ImGui::PushStyleColor(ImGuiCol_ChildBg, IM_COL32(240, 240, 240, 255));
     ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, REPAIR_WINDOW_PADDING);
     ImGui::BeginChild(id, ImVec2(ImGui::GetWindowContentRegionWidth(), REPAIR_WINDOW_HEIGHT), false, ImGuiWindowFlags_AlwaysUseWindowPadding);
-    window::heading("Remove this unused \"x\" local variable.");
+    window::heading(message);
 
     window::text("Code smell");
     ImGui::Text("");
-    ImGui::TextColored(ImVec4(0.6f, 0.6f, 0.6f, 1.0f), "- String x = \"hello\", y = \"world\";");
-    ImGui::TextColored(ImVec4(0.0f, 0.0f, 0.0f, 1.0f), "+ String y = \"world\";");
+    ImGui::TextColored(ImVec4(0.6f, 0.6f, 0.6f, 1.0f), "- %s", removed);
+    ImGui::TextColored(ImVec4(0.0f, 0.0f, 0.0f, 1.0f), "+ %s", added);
     ImGui::EndChild();
     ImGui::PopStyleVar();
     ImGui::PopStyleColor();
@@ -129,7 +129,7 @@ void ui::editor::render(state* s) {
     size_t buffer_pos = 0;
     for (auto& line : s->lines) {
 
-        for (auto [start, end, replacement] : s->repairs) {
+        for (auto [start, end, replacement, message] : s->repairs) {
             auto intersection = find_intersection(
                 {start, end}, {buffer_pos, buffer_pos + line.size()});
             if (!intersection) continue;
@@ -145,12 +145,19 @@ void ui::editor::render(state* s) {
         }
         ImEdit::Line(line.c_str());
 
-        for (auto [start, end, replacement] : s->repairs) {
+        for (auto [start, end, replacement, message] : s->repairs) {
             auto intersection = find_intersection(
                 {start, end}, {buffer_pos, buffer_pos + line.size()});
+            // continue if there is no intersection
             if (!intersection) continue;
+            // continue if we can put this box later
             if (end > buffer_pos + line.size()) continue;
-            draw_child_window(("child_id2" + std::to_string(row)).c_str());
+            auto istart = intersection->first - buffer_pos;
+            auto iend = intersection->second - buffer_pos;
+            draw_child_window(("child_id2" + std::to_string(row)).c_str(),
+                                message.c_str(),
+                                line.substr(istart, iend - istart).c_str(),
+                                replacement.c_str());
         }
 
         row++;
