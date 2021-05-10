@@ -133,7 +133,9 @@ void ui::editor::render(state* s) {
             auto intersection = find_intersection(
                 {start, end}, {buffer_pos, buffer_pos + line.size()});
             if (!intersection) continue;
-            ImEdit::Underline(intersection->first - buffer_pos, intersection->second - buffer_pos);
+            if (ImEdit::Underline(intersection->first - buffer_pos, intersection->second - buffer_pos)) {
+                std::cout << "click " << replacement << std::endl;
+            }
         }
 
         if (row == y + 1) {
