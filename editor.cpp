@@ -129,12 +129,17 @@ void ui::editor::render(state* s) {
     size_t buffer_pos = 0;
     for (auto& line : s->lines) {
 
-        for (auto [start, end, replacement, message] : s->repairs) {
+        bool cursor_in_intersection = false;
+
+        for (auto& [start, end, replacement, message, open] : s->repairs) {
             auto intersection = find_intersection(
                 {start, end}, {buffer_pos, buffer_pos + line.size()});
             if (!intersection) continue;
-            if (ImEdit::Underline(intersection->first - buffer_pos, intersection->second - buffer_pos)) {
+            auto istart = intersection->first - buffer_pos;
+            auto iend = intersection->second - buffer_pos;
+            if (ImEdit::Underline(istart, iend)) {
                 std::cout << "click " << replacement << std::endl;
+                open = !open;
             }
         }
 
@@ -144,7 +149,7 @@ void ui::editor::render(state* s) {
 
         ImEdit::Line(line.c_str());
 
-        for (auto [start, end, replacement, message] : s->repairs) {
+        for (auto [start, end, replacement, message, open] : s->repairs) {
             auto intersection = find_intersection(
                 {start, end}, {buffer_pos, buffer_pos + line.size()});
             // continue if there is no intersection
@@ -153,10 +158,13 @@ void ui::editor::render(state* s) {
             if (end > buffer_pos + line.size()) continue;
             auto istart = intersection->first - buffer_pos;
             auto iend = intersection->second - buffer_pos;
-            draw_child_window(("child_id2" + std::to_string(row)).c_str(),
-                                message.c_str(),
-                                line.substr(istart, iend - istart).c_str(),
-                                replacement.c_str());
+
+            if (open) {
+                draw_child_window(("child_id2" + std::to_string(row)).c_str(),
+                                    message.c_str(),
+                                    line.substr(istart, iend - istart).c_str(),
+                                    replacement.c_str());
+            }
         }
 
         row++;

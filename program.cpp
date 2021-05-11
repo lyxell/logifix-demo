@@ -44,7 +44,9 @@ void run(state* s) {
     {
         const std::lock_guard<std::mutex> lock(s->mutex);
         s->ast = p;
-        s->repairs = filtered_repairs;
+        s->repairs = {};
+        for (auto& [a, b, c, d] : filtered_repairs)
+            s->repairs.emplace_back(a,b,c,d,false);
         s->variables_in_scope = rep.get_variables_in_scope(filename);
     }
 }
