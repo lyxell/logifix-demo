@@ -14,7 +14,7 @@ import java.math.BigDecimal;
 import java.math.MathContext;
 
 public class Test {
-    public static void main(String[] args) {
+    public void test() {
         String x = "hello", y = "world";
         System.out.println(y);
     }
@@ -147,10 +147,11 @@ public class CompareStringsBoxedTypesWithEquals {
 
     // Test from https://rules.sonarsource.com/java/type/Bug/RSPEC-4973
     public void main(String[] args) {
-        String firstName = getFirstName(); // String overrides equals
+        String firstName = getFirstName();
         String lastName = getLastName();
 
-        if (firstName == lastName) { } ; // Noncompliant; false even if the strings have the same value
+        // Noncompliant; false even if the strings have the same value
+        if (firstName == lastName) {};
     }
 
     // Aditional tests
@@ -200,9 +201,10 @@ public class CompareStringsBoxedTypesWithEquals {
 
     // String is not primitive and should use .equals()
     private boolean stringCompare() {
-        String firstName = getFirstName(); // String overrides equals
+        String firstName = getFirstName();
         String lastName = getLastName();
-        if (firstName == lastName) { // Noncompliant
+        // Noncompliant
+        if (firstName == lastName) {
             return true;
         }
         return false;
@@ -241,10 +243,14 @@ public class BigDecimalDoubleConstructor {
     public void main2(String[] args) {
         MathContext mc = null;
         BigDecimal bd1 = new BigDecimal("1");
-        BigDecimal bd2 = new BigDecimal(2.0); // Noncompliant {{Use "BigDecimal.valueOf" instead.}}
-        BigDecimal bd4 = new BigDecimal(2.0, mc); // Noncompliant {{Use "BigDecimal.valueOf" instead.}}
-        BigDecimal bd5 = new BigDecimal(2.0f); // Noncompliant {{Use "BigDecimal.valueOf" instead.}}
-        BigDecimal bd6 = new BigDecimal(2.0f, mc); // Noncompliant {{Use "BigDecimal.valueOf" instead.}}
+        // Noncompliant {{Use "BigDecimal.valueOf" instead.}}
+        BigDecimal bd2 = new BigDecimal(2.0);
+        // Noncompliant {{Use "BigDecimal.valueOf" instead.}}
+        BigDecimal bd4 = new BigDecimal(2.0, mc); 
+        // Noncompliant {{Use "BigDecimal.valueOf" instead.}}
+        BigDecimal bd5 = new BigDecimal(2.0f);
+        // Noncompliant {{Use "BigDecimal.valueOf" instead.}}
+        BigDecimal bd6 = new BigDecimal(2.0f, mc);
         BigDecimal bd3 = BigDecimal.valueOf(2.0);
     }
 
@@ -253,12 +259,18 @@ public class BigDecimalDoubleConstructor {
         double d = 1.1;
         float f = 2.2f;
         float f1 = 2f;
-        BigDecimal bd3 = new BigDecimal(f); // Noncompliant
-        BigDecimal bd4 = new BigDecimal(f1); // Noncompliant
-        BigDecimal bd5 = BigDecimal.valueOf(d); // Compliant
-        BigDecimal bd6 = new BigDecimal("1.1"); // Compliant; using String constructor will result in precise value
-        BigDecimal bd7 = BigDecimal.valueOf(f); // Compliant
-        BigDecimal bd8 = BigDecimal.valueOf(f1); // Compliant
+        // Noncompliant
+        BigDecimal bd3 = new BigDecimal(f);
+        // Noncompliant
+        BigDecimal bd4 = new BigDecimal(f1);
+        // Compliant
+        BigDecimal bd5 = BigDecimal.valueOf(d);
+        // Compliant; using String constructor will result in precise value
+        BigDecimal bd6 = new BigDecimal("1.1");
+        // Compliant
+        BigDecimal bd7 = BigDecimal.valueOf(f);
+        // Compliant
+        BigDecimal bd8 = BigDecimal.valueOf(f1);
     }
 
 }

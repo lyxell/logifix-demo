@@ -1,4 +1,4 @@
-#include "squarelog/repair.h"
+#include "squarelog/squarelog.h"
 #include "state.h"
 #include <iostream>
 
@@ -15,7 +15,7 @@ void run(state* s) {
         }
     }
 
-    repair rep;
+    squarelog::repair rep;
     rep.add_string(filename, data.c_str());
     rep.run();
     auto repairs = rep.get_possible_repairs(filename);
@@ -45,8 +45,15 @@ void run(state* s) {
         const std::lock_guard<std::mutex> lock(s->mutex);
         s->ast = p;
         s->repairs = {};
-        for (auto& [a, b, c, d] : filtered_repairs)
-            s->repairs.emplace_back(a,b,c,d,false);
+        for (auto& [start, end, replacement, message] : filtered_repairs) {
+            repair r;
+            r.start = start;
+            r.end = end;
+            r.message = message;
+            r.replacement = replacement;
+            r.open = false;
+            s->repairs.push_back(r);
+        }
         s->variables_in_scope = rep.get_variables_in_scope(filename);
     }
 }

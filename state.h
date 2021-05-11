@@ -9,11 +9,19 @@
 #include <utility>
 #include <vector>
 
+struct repair {
+    int start;
+    int end;
+    std::string replacement;
+    std::string message;
+    bool open;
+};
+
 struct state {
 
     std::vector<std::string> lines;
     std::weak_ptr<sjp::tree_node> ast;
-    std::vector<std::tuple<int, int, std::string, std::string, bool>> repairs;
+    std::vector<repair> repairs;
     std::vector<std::tuple<std::string, std::string, int, int>> variables_in_scope;
 
     ino_t inode;

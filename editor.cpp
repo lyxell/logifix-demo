@@ -10,7 +10,7 @@
 #include <tuple>
 
 static const auto REPAIR_WINDOW_PADDING = ImVec2(32.0f, 24.0f);
-static const auto REPAIR_WINDOW_HEIGHT = 160.0f;
+static const auto REPAIR_WINDOW_HEIGHT = 190.0f;
 
 void ui::editor::handle_keypress(state* s) {
     auto& lines = s->lines;
@@ -97,21 +97,50 @@ find_intersection(std::pair<int, int> a, std::pair<int, int> b) {
     return std::pair(b.first, std::min(a.second, b.second));
 }
 
-void draw_child_window(const char* id, const char* message, const char* removed, const char* added) {
+bool draw_child_window(std::vector<std::string>& lines, const char* id, repair& r) {
+    bool close = false;
     ImGui::Unindent();
-    ImGui::PushStyleColor(ImGuiCol_ChildBg, IM_COL32(240, 240, 240, 255));
+    ImGui::PushStyleColor(ImGuiCol_ChildBg, IM_COL32(60, 60, 60, 255));
+    ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(255, 255, 255, 255));
+    ImGui::PushStyleColor(ImGuiCol_Button, IM_COL32(87, 87, 87, 255));
+    ImGui::PushStyleColor(ImGuiCol_ButtonHovered, IM_COL32(100, 100, 100, 255));
+    ImGui::PushStyleColor(ImGuiCol_ButtonActive, IM_COL32(100, 100, 100, 255));
     ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, REPAIR_WINDOW_PADDING);
+    ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(20.0f, 8.0f));
+    ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 3.0f);
+    ImGui::Dummy(ImVec2(0.0f, 8.0f));
     ImGui::BeginChild(id, ImVec2(ImGui::GetWindowContentRegionWidth(), REPAIR_WINDOW_HEIGHT), false, ImGuiWindowFlags_AlwaysUseWindowPadding);
-    window::heading(message);
+    window::heading(r.message.c_str());
 
+    ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(180, 180, 180, 255));
     window::text("Code smell");
+    ImGui::PopStyleColor();
     ImGui::Text("");
-    ImGui::TextColored(ImVec4(0.6f, 0.6f, 0.6f, 1.0f), "- %s", removed);
-    ImGui::TextColored(ImVec4(0.0f, 0.0f, 0.0f, 1.0f), "+ %s", added);
+    size_t buffer_pos = 0;
+    for (auto& line : lines) {
+        auto intersection = find_intersection({r.start, r.end}, {buffer_pos, buffer_pos + line.size()});
+        if (intersection) {
+            ImGui::TextColored(ImVec4(0.6f,0.6f,0.6f,1.0f), "- %s", line.c_str());
+        }
+        buffer_pos += line.size() + 1;
+    }
+    //ImGui::TextColored(ImVec4(1.0f,1.0f,1.0f,1.0f), "+ %s", added);
+    ImGui::Text("");
+    close |= ImGui::Button("Close");
+    ImGui::SameLine();
+    close |= ImGui::Button("Apply");
     ImGui::EndChild();
+    ImGui::Dummy(ImVec2(0.0f, 8.0f));
+    ImGui::PopStyleVar();
+    ImGui::PopStyleVar();
     ImGui::PopStyleVar();
     ImGui::PopStyleColor();
+    ImGui::PopStyleColor();
+    ImGui::PopStyleColor();
+    ImGui::PopStyleColor();
+    ImGui::PopStyleColor();
     ImGui::Indent();
+    return close;
 }
 
 void ui::editor::render(state* s) {
@@ -119,7 +148,7 @@ void ui::editor::render(state* s) {
     auto& [x, y] = s->cursor;
     ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 12.0f));
     ImGui::PushStyleVar(ImGuiStyleVar_CellPadding, ImVec2(0.0f, 2.0f));
-    ImGui::PushStyleVar(ImGuiStyleVar_ChildBorderSize, 0.0f);
+    ImGui::PushStyleVar(ImGuiStyleVar_ChildBorderSize, 1.0f);
     ImGui::Begin("Editor");
 
     ImEdit::Begin("test");
@@ -149,21 +178,19 @@ void ui::editor::render(state* s) {
 
         ImEdit::Line(line.c_str());
 
-        for (auto [start, end, replacement, message, open] : s->repairs) {
+        for (auto& rep : s->repairs) {
             auto intersection = find_intersection(
-                {start, end}, {buffer_pos, buffer_pos + line.size()});
+                {rep.start, rep.end}, {buffer_pos, buffer_pos + line.size()});
             // continue if there is no intersection
             if (!intersection) continue;
-            // continue if we can put this box later
-            if (end > buffer_pos + line.size()) continue;
+            // continue if we can place this box later
+            if (rep.end > buffer_pos + line.size()) continue;
             auto istart = intersection->first - buffer_pos;
             auto iend = intersection->second - buffer_pos;
 
-            if (open) {
-                draw_child_window(("child_id2" + std::to_string(row)).c_str(),
-                                    message.c_str(),
-                                    line.substr(istart, iend - istart).c_str(),
-                                    replacement.c_str());
+            if (rep.open) {
+                bool close = draw_child_window(s->lines, ("child_id2" + std::to_string(row)).c_str(), rep);
+                if (close) rep.open = false;
             }
         }
 
