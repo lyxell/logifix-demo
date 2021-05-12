@@ -1,12 +1,4 @@
-# squarelog-demo
-
-This is a demo of
-[SquareLog](https://github.com/lyxell/squarelog), an approach to
-automatic repair of SonarQube static analysis violations.
-
-![](https://i.imgur.com/KJDHi5n.gif)
-
-### Building the demo
+### Building
 
 #### Debian/Ubuntu
 
