@@ -1,8 +1,6 @@
 IMGUI_BOILERPLATE_ARCHIVE=imgui-boilerplate/imgui-boilerplate.a
 SQUARELOG_ARCHIVE=squarelog/squarelog.a
 
-OBJS = editor.o dockspace.o main.o ast.o program.o imedit/imedit.o
-
 LIBS = -lm -lpthread
 UNAME_S := $(shell uname -s)
 CXXFLAGS = -std=c++17 -fPIC -O2 -g
@@ -36,7 +34,10 @@ all: editor libprogram.so
 libprogram.so: program.o $(SQUARELOG_ARCHIVE)
 	$(CXX) -o $@ -shared -Wl,--whole-archive $^ -Wl,--no-whole-archive
 
-editor: main.o editor.o dockspace.o ast.o imedit/imedit.o $(IMGUI_BOILERPLATE_ARCHIVE)
+ImGuiFileDialog.o: ImGuiFileDialog/ImGuiFileDialog.cpp
+	$(CXX) $(CXXFLAGS) $< -c -o $@
+
+editor: main.o editor.o dockspace.o ast.o imedit/imedit.o ImGuiFileDialog.o $(IMGUI_BOILERPLATE_ARCHIVE)
 	$(CXX) -o $@ $^ $(LIBS)
 
 .PHONY: $(SQUARELOG_ARCHIVE) $(IMGUI_BOILERPLATE_ARCHIVE)
@@ -50,5 +51,3 @@ $(SQUARELOG_ARCHIVE):
 clean:
 	$(MAKE) -C imgui-boilerplate clean
 	$(MAKE) -C datalog-repair clean
-	rm -rf $(OBJS)
-
