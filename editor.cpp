@@ -178,7 +178,7 @@ void ui::editor::render(state* s) {
     ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 12.0f));
     ImGui::PushStyleVar(ImGuiStyleVar_CellPadding, ImVec2(0.0f, 2.0f));
     ImGui::PushStyleVar(ImGuiStyleVar_ChildBorderSize, 1.0f);
-    ImGui::Begin("Editor");
+    ImGui::Begin("SquareLog Demo");
 
     ImEdit::Begin("test");
     ImGui::Indent();
@@ -202,7 +202,7 @@ void ui::editor::render(state* s) {
         }
 
         if (row == y + 1) {
-            ImEdit::Cursor(x);
+            ImEdit::Cursor(std::min(x, (int) line.size()));
         }
 
         ImEdit::Line(line.c_str());
