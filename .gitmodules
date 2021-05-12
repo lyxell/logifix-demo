@@ -7,3 +7,6 @@
 [submodule "squarelog"]
 	path = squarelog
 	url = https://github.com/lyxell/squarelog.git
+[submodule "ImGuiFileDialog"]
+	path = ImGuiFileDialog
+	url = https://github.com/aiekick/ImGuiFileDialog.git
