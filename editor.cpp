@@ -103,7 +103,7 @@ find_intersection(std::pair<int, int> a, std::pair<int, int> b) {
     return std::pair(b.first, std::min(a.second, b.second));
 }
 
-void draw_child_window(std::vector<std::string>& lines, const char* id, repair& r) {
+void draw_child_window(state* s, const char* id, repair& r) {
     ImGui::Unindent();
     ImGui::PushStyleColor(ImGuiCol_ChildBg, IM_COL32(60, 60, 60, 255));
     ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(255, 255, 255, 255));
@@ -125,7 +125,7 @@ void draw_child_window(std::vector<std::string>& lines, const char* id, repair& 
     size_t buffer_pos = 0;
     size_t buffer_start = 0;
     std::string buffer;
-    for (auto& line : lines) {
+    for (auto& line : s->lines) {
         auto intersection = find_intersection({r.start, r.end}, {buffer_pos, buffer_pos + line.size()});
         if (intersection) {
             if (buffer.empty()) buffer_start = buffer_pos;
@@ -140,9 +140,23 @@ void draw_child_window(std::vector<std::string>& lines, const char* id, repair& 
         ImGui::TextColored(ImVec4(1.0f, 1.0f, 1.0f, 1.0f), "+ %s", s.c_str());
     }
     ImGui::Text("");
-    if (ImGui::Button("Close")) r.open = false;
+    if (ImGui::Button("Close")) {
+        r.open = false;
+    }
     ImGui::SameLine();
-    if (ImGui::Button("Apply")) r.open = false;
+    if (ImGui::Button("Apply")) {
+        std::string result;
+        for (auto& line : s->lines) {
+            result += line += '\n';
+        }
+        result = result.substr(0, r.start) + r.replacement + result.substr(r.end);
+        s->lines = {};
+        for (auto str : split_string(result, "\n")) {
+            s->lines.emplace_back(str);
+        }
+        s->dirty = true;
+        r.open = false;
+    }
     float win_end = ImGui::GetCursorPosY();
     r.window_height = win_end - win_start + 50.0f;
     ImGui::EndChild();
@@ -204,7 +218,7 @@ void ui::editor::render(state* s) {
             auto iend = intersection->second - buffer_pos;
 
             if (rep.open) {
-                draw_child_window(s->lines, ("child_id2" + std::to_string(row)).c_str(), rep);
+                draw_child_window(s, ("child_id2" + std::to_string(row)).c_str(), rep);
             }
         }
 
