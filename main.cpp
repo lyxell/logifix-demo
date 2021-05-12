@@ -8,6 +8,17 @@
 #include <thread>
 
 static const std::string file = R"(import java.util.ArrayList;
+public class Test {
+    public void test() {
+        String x = "hello", y = "world";
+        if (x == "") {
+            System.out.println(y);
+        }
+    }
+}
+)";
+
+static const std::string file2 = R"(import java.util.ArrayList;
 import java.util.NoSuchElementException;
 import java.util.List;
 import java.math.BigDecimal;

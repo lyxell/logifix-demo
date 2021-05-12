@@ -44,15 +44,26 @@ void run(state* s) {
     {
         const std::lock_guard<std::mutex> lock(s->mutex);
         s->ast = p;
-        s->repairs = {};
-        for (auto& [start, end, replacement, message] : filtered_repairs) {
-            repair r;
-            r.start = start;
-            r.end = end;
-            r.message = message;
-            r.replacement = replacement;
-            r.open = false;
-            s->repairs.push_back(r);
+        if (filtered_repairs.size() == s->repairs.size()) {
+            for (size_t i = 0; i < filtered_repairs.size(); i++) {
+                auto& [start, end, replacement, message] = filtered_repairs[i];
+                s->repairs[i].start = start;
+                s->repairs[i].end = end;
+                s->repairs[i].message = message;
+                s->repairs[i].replacement = replacement;
+            }
+        } else {
+            s->repairs = {};
+            for (auto& [start, end, replacement, message] : filtered_repairs) {
+                repair r;
+                r.start = start;
+                r.end = end;
+                r.message = message;
+                r.replacement = replacement;
+                r.open = false;
+                r.window_height = 160.0f;
+                s->repairs.push_back(r);
+            }
         }
         s->variables_in_scope = rep.get_variables_in_scope(filename);
     }

@@ -12,6 +12,25 @@
 static const auto REPAIR_WINDOW_PADDING = ImVec2(32.0f, 24.0f);
 static const auto REPAIR_WINDOW_HEIGHT = 190.0f;
 
+std::vector<std::string> split_string(const std::string& str,
+                                      const std::string& delimiter)
+{
+    std::vector<std::string> strings;
+
+    std::string::size_type pos = 0;
+    std::string::size_type prev = 0;
+    while ((pos = str.find(delimiter, prev)) != std::string::npos)
+    {
+        strings.push_back(str.substr(prev, pos - prev));
+        prev = pos + 1;
+    }
+
+    // To get the last substring (or only, if delimiter is not found)
+    strings.push_back(str.substr(prev));
+
+    return strings;
+}
+
 void ui::editor::handle_keypress(state* s) {
     auto& lines = s->lines;
     auto& [x, y] = s->cursor;
@@ -70,19 +89,6 @@ void ui::editor::handle_keypress(state* s) {
     }
 }
 
-static void TextWithBackground(ImU32 color, const char* str) {
-    static const auto HIGHLIGHT_PADDING = ImVec2(2.0f, 1.0f);
-    static const auto HIGHLIGHT_ROUNDING = 2.0f;
-    auto* drawList = ImGui::GetWindowDrawList();
-    auto rect_upper_left = ImGui::GetCursorScreenPos() - HIGHLIGHT_PADDING;
-    auto rect_lower_right =
-        rect_upper_left + ImGui::CalcTextSize(str) + HIGHLIGHT_PADDING;
-
-    drawList->AddRectFilled(rect_upper_left, rect_lower_right, color,
-                            HIGHLIGHT_ROUNDING);
-    ImGui::Text("%s", str);
-}
-
 /**
  * Returns intersection of two one-dimensional segments [a1,a2), [b1, b2)
  */
@@ -97,8 +103,7 @@ find_intersection(std::pair<int, int> a, std::pair<int, int> b) {
     return std::pair(b.first, std::min(a.second, b.second));
 }
 
-bool draw_child_window(std::vector<std::string>& lines, const char* id, repair& r) {
-    bool close = false;
+void draw_child_window(std::vector<std::string>& lines, const char* id, repair& r) {
     ImGui::Unindent();
     ImGui::PushStyleColor(ImGuiCol_ChildBg, IM_COL32(60, 60, 60, 255));
     ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(255, 255, 255, 255));
@@ -109,7 +114,8 @@ bool draw_child_window(std::vector<std::string>& lines, const char* id, repair& 
     ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(20.0f, 8.0f));
     ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 3.0f);
     ImGui::Dummy(ImVec2(0.0f, 8.0f));
-    ImGui::BeginChild(id, ImVec2(ImGui::GetWindowContentRegionWidth(), REPAIR_WINDOW_HEIGHT), false, ImGuiWindowFlags_AlwaysUseWindowPadding);
+    ImGui::BeginChild(id, ImVec2(ImGui::GetWindowContentRegionWidth(), r.window_height), false, ImGuiWindowFlags_AlwaysUseWindowPadding);
+    float win_start = ImGui::GetCursorPosY();
     window::heading(r.message.c_str());
 
     ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(180, 180, 180, 255));
@@ -117,18 +123,28 @@ bool draw_child_window(std::vector<std::string>& lines, const char* id, repair& 
     ImGui::PopStyleColor();
     ImGui::Text("");
     size_t buffer_pos = 0;
+    size_t buffer_start = 0;
+    std::string buffer;
     for (auto& line : lines) {
         auto intersection = find_intersection({r.start, r.end}, {buffer_pos, buffer_pos + line.size()});
         if (intersection) {
+            if (buffer.empty()) buffer_start = buffer_pos;
+            if (!buffer.empty()) buffer += "\n";
+            buffer += line;
             ImGui::TextColored(ImVec4(0.6f,0.6f,0.6f,1.0f), "- %s", line.c_str());
         }
         buffer_pos += line.size() + 1;
     }
-    //ImGui::TextColored(ImVec4(1.0f,1.0f,1.0f,1.0f), "+ %s", added);
+    buffer = buffer.substr(0, r.start - buffer_start) + r.replacement + buffer.substr(r.end - buffer_start);
+    for (auto s : split_string(buffer, "\n")) {
+        ImGui::TextColored(ImVec4(1.0f, 1.0f, 1.0f, 1.0f), "+ %s", s.c_str());
+    }
     ImGui::Text("");
-    close |= ImGui::Button("Close");
+    if (ImGui::Button("Close")) r.open = false;
     ImGui::SameLine();
-    close |= ImGui::Button("Apply");
+    if (ImGui::Button("Apply")) r.open = false;
+    float win_end = ImGui::GetCursorPosY();
+    r.window_height = win_end - win_start + 50.0f;
     ImGui::EndChild();
     ImGui::Dummy(ImVec2(0.0f, 8.0f));
     ImGui::PopStyleVar();
@@ -140,7 +156,6 @@ bool draw_child_window(std::vector<std::string>& lines, const char* id, repair& 
     ImGui::PopStyleColor();
     ImGui::PopStyleColor();
     ImGui::Indent();
-    return close;
 }
 
 void ui::editor::render(state* s) {
@@ -160,7 +175,7 @@ void ui::editor::render(state* s) {
 
         bool cursor_in_intersection = false;
 
-        for (auto& [start, end, replacement, message, open] : s->repairs) {
+        for (auto& [start, end, replacement, message, open, wh] : s->repairs) {
             auto intersection = find_intersection(
                 {start, end}, {buffer_pos, buffer_pos + line.size()});
             if (!intersection) continue;
@@ -189,8 +204,7 @@ void ui::editor::render(state* s) {
             auto iend = intersection->second - buffer_pos;
 
             if (rep.open) {
-                bool close = draw_child_window(s->lines, ("child_id2" + std::to_string(row)).c_str(), rep);
-                if (close) rep.open = false;
+                draw_child_window(s->lines, ("child_id2" + std::to_string(row)).c_str(), rep);
             }
         }
 

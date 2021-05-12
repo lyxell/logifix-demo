@@ -15,6 +15,7 @@ struct repair {
     std::string replacement;
     std::string message;
     bool open;
+    size_t window_height;
 };
 
 struct state {
