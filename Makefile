@@ -1,7 +1,7 @@
 IMGUI_BOILERPLATE_ARCHIVE=imgui-boilerplate/imgui-boilerplate.a
-DATALOG_REPAIR_ARCHIVE=datalog-repair/datalog-repair.a
+SQUARELOG_ARCHIVE=squarelog/squarelog.a
 
-OBJS = editor.o dockspace.o main.o ast.o program.o
+OBJS = editor.o dockspace.o main.o ast.o program.o imedit/imedit.o
 
 LIBS = -lm -lpthread
 UNAME_S := $(shell uname -s)
@@ -33,19 +33,19 @@ endif
 
 all: editor libprogram.so
 
-libprogram.so: program.o $(DATALOG_REPAIR_ARCHIVE)
+libprogram.so: program.o $(SQUARELOG_ARCHIVE)
 	$(CXX) -o $@ -shared -Wl,--whole-archive $^ -Wl,--no-whole-archive
 
-editor: main.o editor.o dockspace.o ast.o $(IMGUI_BOILERPLATE_ARCHIVE)
+editor: main.o editor.o dockspace.o ast.o imedit/imedit.o $(IMGUI_BOILERPLATE_ARCHIVE)
 	$(CXX) -o $@ $^ $(LIBS)
 
-.PHONY: $(DATALOG_REPAIR_ARCHIVE)
+.PHONY: $(SQUARELOG_ARCHIVE) $(IMGUI_BOILERPLATE_ARCHIVE)
 
 $(IMGUI_BOILERPLATE_ARCHIVE):
 	$(MAKE) -C imgui-boilerplate
 
-$(DATALOG_REPAIR_ARCHIVE):
-	$(MAKE) -C datalog-repair
+$(SQUARELOG_ARCHIVE):
+	$(MAKE) -C squarelog
 
 clean:
 	$(MAKE) -C imgui-boilerplate clean

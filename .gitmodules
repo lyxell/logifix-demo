@@ -1,6 +1,9 @@
 [submodule "imgui-boilerplate"]
 	path = imgui-boilerplate
 	url = https://github.com/lyxell/imgui-boilerplate.git
-[submodule "datalog-repair"]
-	path = datalog-repair
-	url = https://github.com/lyxell/datalog-repair.git
+[submodule "imedit"]
+	path = imedit
+	url = https://github.com/lyxell/imedit.git
+[submodule "squarelog"]
+	path = squarelog
+	url = https://github.com/lyxell/squarelog.git

@@ -3,14 +3,33 @@
 #include "imgui-boilerplate/window.h"
 #include "imgui.h"
 #include "state.h"
-#include <thread>
 #include <dlfcn.h>
 #include <iostream>
+#include <thread>
 
 static const std::string file = R"(import java.util.ArrayList;
+public class Test {
+    public void test() {
+        String x = "hello", y = "world";
+        if (x == "") {
+            System.out.println(y);
+        }
+    }
+}
+)";
+
+static const std::string file2 = R"(import java.util.ArrayList;
+import java.util.NoSuchElementException;
 import java.util.List;
 import java.math.BigDecimal;
 import java.math.MathContext;
+
+public class Test {
+    public void test() {
+        String x = "hello", y = "world";
+        System.out.println(y);
+    }
+}
 
 public class Main {
   public static void s1125() {
@@ -70,11 +89,11 @@ public class Main {
     BigDecimal bd1 = new BigDecimal(d);
     BigDecimal bd2 = new BigDecimal(f);
     BigDecimal bd3 = new BigDecimal(1.1);
-    BigDecimal bd3 = new BigDecimal(1.1f);
-    BigDecimal bd4 = new BigDecimal(d, mc);
-    BigDecimal bd5 = new BigDecimal(f, mc);
-    BigDecimal bd6 = new BigDecimal(1.1, mc);
-    BigDecimal bd6 = new BigDecimal(1.1f, mc);
+    BigDecimal bd4 = new BigDecimal(1.1f);
+    BigDecimal bd5 = new BigDecimal(d, mc);
+    BigDecimal bd6 = new BigDecimal(f, mc);
+    BigDecimal bd7 = new BigDecimal(1.1, mc);
+    BigDecimal bd8 = new BigDecimal(1.1f, mc);
   }
   public static void s2204() {
     /**
@@ -103,7 +122,7 @@ public class Main {
      * https://rules.sonarsource.com/java/RSPEC-2293
      */
     ArrayList<Integer> x = new ArrayList<Integer>();
-    List<String> x = new ArrayList<String>();
+    List<String> y = new ArrayList<String>();
   }
   public static void s3984() {
     /**
@@ -139,10 +158,11 @@ public class CompareStringsBoxedTypesWithEquals {
 
     // Test from https://rules.sonarsource.com/java/type/Bug/RSPEC-4973
     public void main(String[] args) {
-        String firstName = getFirstName(); // String overrides equals
+        String firstName = getFirstName();
         String lastName = getLastName();
 
-        if (firstName == lastName) { } ; // Noncompliant; false even if the strings have the same value
+        // Noncompliant; false even if the strings have the same value
+        if (firstName == lastName) {};
     }
 
     // Aditional tests
@@ -192,9 +212,10 @@ public class CompareStringsBoxedTypesWithEquals {
 
     // String is not primitive and should use .equals()
     private boolean stringCompare() {
-        String firstName = getFirstName(); // String overrides equals
+        String firstName = getFirstName();
         String lastName = getLastName();
-        if (firstName == lastName) { // Noncompliant
+        // Noncompliant
+        if (firstName == lastName) {
             return true;
         }
         return false;
@@ -209,11 +230,11 @@ public class CompareStringsBoxedTypesWithEquals {
         eq = a == x; // Compliant
     }
 
-    private String getFirstName(){
+    private String getFirstName() {
         return new String("John");
     }
 
-    private String getLastName(){
+    private String getLastName() {
         return new String("John");
     }
 
@@ -233,24 +254,34 @@ public class BigDecimalDoubleConstructor {
     public void main2(String[] args) {
         MathContext mc = null;
         BigDecimal bd1 = new BigDecimal("1");
-        BigDecimal bd2 = new BigDecimal(2.0); // Noncompliant {{Use "BigDecimal.valueOf" instead.}}
-        BigDecimal bd4 = new BigDecimal(2.0, mc); // Noncompliant {{Use "BigDecimal.valueOf" instead.}}
-        BigDecimal bd5 = new BigDecimal(2.0f); // Noncompliant {{Use "BigDecimal.valueOf" instead.}}
-        BigDecimal bd6 = new BigDecimal(2.0f, mc); // Noncompliant {{Use "BigDecimal.valueOf" instead.}}
+        // Noncompliant {{Use "BigDecimal.valueOf" instead.}}
+        BigDecimal bd2 = new BigDecimal(2.0);
+        // Noncompliant {{Use "BigDecimal.valueOf" instead.}}
+        BigDecimal bd4 = new BigDecimal(2.0, mc); 
+        // Noncompliant {{Use "BigDecimal.valueOf" instead.}}
+        BigDecimal bd5 = new BigDecimal(2.0f);
+        // Noncompliant {{Use "BigDecimal.valueOf" instead.}}
+        BigDecimal bd6 = new BigDecimal(2.0f, mc);
         BigDecimal bd3 = BigDecimal.valueOf(2.0);
     }
 
-    // Aditional tests
+    // Additional tests
     public void foo(String[] args) {
         double d = 1.1;
         float f = 2.2f;
         float f1 = 2f;
-        BigDecimal bd3 = new BigDecimal(f); // Noncompliant
-        BigDecimal bd4 = new BigDecimal(f1); // Noncompliant
-        BigDecimal bd5 = BigDecimal.valueOf(d); // Compliant
-        BigDecimal bd6 = new BigDecimal("1.1"); // Compliant; using String constructor will result in precise value
-        BigDecimal bd7 = BigDecimal.valueOf(f); // Compliant
-        BigDecimal bd8 = BigDecimal.valueOf(f1); // Compliant
+        // Noncompliant
+        BigDecimal bd3 = new BigDecimal(f);
+        // Noncompliant
+        BigDecimal bd4 = new BigDecimal(f1);
+        // Compliant
+        BigDecimal bd5 = BigDecimal.valueOf(d);
+        // Compliant; using String constructor will result in precise value
+        BigDecimal bd6 = new BigDecimal("1.1");
+        // Compliant
+        BigDecimal bd7 = BigDecimal.valueOf(f);
+        // Compliant
+        BigDecimal bd8 = BigDecimal.valueOf(f1);
     }
 
 }
@@ -391,6 +422,22 @@ public class Test {
     }
 }
 
+public class MyIterator implements Iterator<String> {
+  public String next() {
+    if (!hasNext()) {
+      return null;
+    }
+  }
+}
+
+public class MyIterator implements Iterator<String> {
+  public String next() {
+    if (!hasNext()) {
+      throw new NoSuchElementException();
+    }
+  }
+}
+
 )";
 
 const char* libpath = "./libprogram.so";
@@ -398,7 +445,7 @@ const char* libpath = "./libprogram.so";
 int main() {
     void* handle = nullptr;
     void* render_function = nullptr;
-    state s = {.cursor = {0, 0}, .show_demo_window = false};
+    state s = {.cursor = {0, 0}, .show_demo_window = true};
     std::istringstream f(file);
     std::string line;
     while (std::getline(f, line)) {
@@ -406,7 +453,6 @@ int main() {
     }
     std::string filename = "Example.java";
     window::init();
-    bool show_demo_window = true;
     while (!window::is_exiting()) {
         struct stat attr;
         if ((stat(libpath, &attr) == 0) && (s.inode != attr.st_ino)) {
@@ -459,6 +505,32 @@ int main() {
         } else {
             ui::ast::render("Test", nullptr, buffer_position);
         }
+
+        {
+            const std::lock_guard<std::mutex> lock(s.mutex);
+            ImGui::Begin("Variables in scope");
+            std::set<std::pair<std::string,std::string>> vars;
+            for (auto [v, type, a, b] : s.variables_in_scope) {
+                if (a <= buffer_position && b >= buffer_position) {
+                    vars.emplace(v, type);
+                }
+            }
+            if (ImGui::BeginTable("Declared variables", 2)) {
+                ImGui::TableSetupColumn("Variable name");
+                ImGui::TableSetupColumn("Type");
+                ImGui::TableHeadersRow();
+                for (auto [v, type] : vars) {
+                    ImGui::TableNextRow();
+                    ImGui::TableNextColumn();
+                    ImGui::Text("%s", v.c_str());
+                    ImGui::TableNextColumn();
+                    ImGui::Text("%s", type.c_str());
+                }
+                ImGui::EndTable();
+            }
+            ImGui::End();
+        }
+
         if (s.show_demo_window) {
             ImGui::ShowDemoWindow();
         }
