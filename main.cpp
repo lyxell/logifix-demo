@@ -15,7 +15,7 @@ const char* libpath = "./libprogram.so";
 int main() {
     void* handle = nullptr;
     void* render_function = nullptr;
-    state s = {.cursor = {0, 0}, .show_demo_window = true};
+    state s = {.cursor = {0, 0}, .show_demo_window = false};
     std::istringstream f(file);
     std::string line;
     while (std::getline(f, line)) {
