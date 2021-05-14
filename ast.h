@@ -1,5 +1,5 @@
 #pragma once
-#include "squarelog/squarelog.h"
+#include "squarelog/logifix.h"
 #include <string>
 
 namespace ui::ast {

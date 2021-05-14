@@ -1,9 +1,10 @@
-#include "squarelog/squarelog.h"
+#include "squarelog/logifix.h"
 #include "state.h"
 #include <iostream>
 
 extern "C" {
 void run(state* s) {
+    typedef std::chrono::high_resolution_clock hclock;
     const char* filename = "Example.java";
     std::string data;
 
@@ -15,9 +16,15 @@ void run(state* s) {
         }
     }
 
-    squarelog::repair rep;
+    logifix::repair rep;
     rep.add_string(filename, data.c_str());
+    auto t1 = hclock::now();
     rep.run();
+    auto t2 = hclock::now();
+    std::cout << "Time difference:"
+              << std::chrono::duration_cast<std::chrono::milliseconds>(t2 - t1)
+                     .count()
+              << " milliseconds" << std::endl;
     auto repairs = rep.get_possible_repairs(filename);
     // temporary way to not include overlapping repairs
     decltype(repairs) filtered_repairs;

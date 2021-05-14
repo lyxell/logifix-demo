@@ -33,7 +33,7 @@ int main() {
                 handle = nullptr;
                 render_function = nullptr;
             }
-            handle = dlopen(libpath, RTLD_LAZY);
+            handle = dlopen(libpath, RTLD_NOW);
             if (handle == nullptr) {
                 std::cerr << "could not connect to libprogram: " << dlerror()
                           << std::endl;

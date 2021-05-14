@@ -1,9 +1,9 @@
 IMGUI_BOILERPLATE_ARCHIVE=imgui-boilerplate/imgui-boilerplate.a
-SQUARELOG_ARCHIVE=squarelog/squarelog.a
+SQUARELOG_ARCHIVE=squarelog/logifix.a
 
 LIBS = -lm -lpthread
 UNAME_S := $(shell uname -s)
-CXXFLAGS = -std=c++17 -fPIC -O2 -g
+CXXFLAGS = -std=c++17 -fPIC -O2
 CXXFLAGS += -Iimgui-boilerplate/imgui
 
 SOUFFLE=souffle
@@ -50,4 +50,4 @@ $(SQUARELOG_ARCHIVE):
 
 clean:
 	$(MAKE) -C imgui-boilerplate clean
-	$(MAKE) -C datalog-repair clean
+	$(MAKE) -C squarelog clean
