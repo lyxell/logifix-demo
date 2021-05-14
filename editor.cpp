@@ -113,6 +113,8 @@ void draw_child_window(state* s, const char* id, repair& r) {
     ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, REPAIR_WINDOW_PADDING);
     ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(20.0f, 8.0f));
     ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 3.0f);
+    ImGui::PushStyleVar(ImGuiStyleVar_FrameBorderSize, 0.0f);
+    ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(12.0f, 4.0f));
     ImGui::Dummy(ImVec2(0.0f, 8.0f));
     ImGui::BeginChild(id, ImVec2(ImGui::GetWindowContentRegionWidth(), r.window_height), false, ImGuiWindowFlags_AlwaysUseWindowPadding);
     float win_start = ImGui::GetCursorPosY();
@@ -131,13 +133,13 @@ void draw_child_window(state* s, const char* id, repair& r) {
             if (buffer.empty()) buffer_start = buffer_pos;
             if (!buffer.empty()) buffer += "\n";
             buffer += line;
-            ImGui::TextColored(ImVec4(0.6f,0.6f,0.6f,1.0f), "- %s", line.c_str());
+            ImGui::TextColored(ImVec4(0.6f,0.6f,0.6f,1.0f), "%s", line.c_str());
         }
         buffer_pos += line.size() + 1;
     }
     buffer = buffer.substr(0, r.start - buffer_start) + r.replacement + buffer.substr(r.end - buffer_start);
     for (auto s : split_string(buffer, "\n")) {
-        ImGui::TextColored(ImVec4(1.0f, 1.0f, 1.0f, 1.0f), "+ %s", s.c_str());
+        ImGui::TextColored(ImVec4(1.0f, 1.0f, 1.0f, 1.0f), "%s", s.c_str());
     }
     ImGui::Text("");
     if (ImGui::Button("Close")) {
@@ -161,6 +163,8 @@ void draw_child_window(state* s, const char* id, repair& r) {
     r.window_height = win_end - win_start + 50.0f;
     ImGui::EndChild();
     ImGui::Dummy(ImVec2(0.0f, 8.0f));
+    ImGui::PopStyleVar();
+    ImGui::PopStyleVar();
     ImGui::PopStyleVar();
     ImGui::PopStyleVar();
     ImGui::PopStyleVar();
