@@ -3,7 +3,7 @@ SQUARELOG_ARCHIVE=squarelog/logifix.a
 
 LIBS = -lm -lpthread
 UNAME_S := $(shell uname -s)
-CXXFLAGS = -std=c++17 -fPIC -O2
+CXXFLAGS = -std=c++17 -g -fPIC -O2 -Wfatal-errors
 CXXFLAGS += -Iimgui-boilerplate/imgui
 
 SOUFFLE=souffle
@@ -49,5 +49,6 @@ $(SQUARELOG_ARCHIVE):
 	$(MAKE) -C squarelog
 
 clean:
+	rm -rf *.o *.so editor
 	$(MAKE) -C imgui-boilerplate clean
 	$(MAKE) -C squarelog clean

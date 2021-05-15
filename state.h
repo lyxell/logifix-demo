@@ -21,7 +21,7 @@ struct repair {
 struct state {
 
     std::vector<std::string> lines;
-    std::weak_ptr<sjp::tree_node> ast;
+    sjp::ast ast;
     std::vector<repair> repairs;
     std::vector<std::tuple<std::string, std::string, int, int>> variables_in_scope;
 

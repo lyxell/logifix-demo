@@ -3,7 +3,6 @@
 #include <string>
 
 namespace ui::ast {
-void render_node(const std::shared_ptr<sjp::tree_node>& node, size_t pos);
-void render(const std::string& filename,
-            const std::shared_ptr<sjp::tree_node>& node, size_t position);
+void render_node(sjp::ast& ast, sjp::ast_node node, size_t pos);
+void render(const std::string& filename, sjp::ast& ast, size_t pos);
 } // namespace ui::ast

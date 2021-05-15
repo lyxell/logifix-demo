@@ -8,7 +8,10 @@
 #include <iostream>
 #include <thread>
 
-static const std::string file = "import java.util.ArrayList;\n\n";
+static const std::string file = R"(import java.lang.Exception;
+import java.io.*;
+import java.util.function.IntFunction;
+)";
 
 const char* libpath = "./libprogram.so";
 
@@ -69,11 +72,9 @@ int main() {
         buffer_position +=
             std::min(s.cursor.first, int(s.lines[s.cursor.second].size()));
 
-        if (!s.ast.expired()) {
+        {
             const std::lock_guard<std::mutex> lock(s.mutex);
-            ui::ast::render("Test", s.ast.lock(), buffer_position);
-        } else {
-            ui::ast::render("Test", nullptr, buffer_position);
+            ui::ast::render("Test", s.ast, buffer_position);
         }
 
         ImGui::Begin("Open file");
