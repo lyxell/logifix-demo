@@ -73,8 +73,8 @@ int main() {
             std::min(s.cursor.first, int(s.lines[s.cursor.second].size()));
 
         {
-            const std::lock_guard<std::mutex> lock(s.mutex);
-            ui::ast::render("Test", s.ast, buffer_position);
+            //const std::lock_guard<std::mutex> lock(s.mutex);
+            //ui::ast::render("Test", s.ast, buffer_position);
         }
 
         ImGui::Begin("Open file");

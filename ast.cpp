@@ -1,6 +1,7 @@
 #include "ast.h"
 #include "imgui.h"
 
+/*
 void ui::ast::render_node(sjp::ast& ast, sjp::ast_node node, size_t pos) {
     if (node == 0) {
         return;
@@ -61,3 +62,4 @@ void ui::ast::render(const std::string& filename,
     render_node(ast, ast.root, position);
     ImGui::End();
 }
+*/
