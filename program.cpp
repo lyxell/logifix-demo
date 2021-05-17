@@ -70,7 +70,7 @@ void run(state* s) {
                 s->repairs.push_back(r);
             }
         }
-        //s->variables_in_scope = rep.get_variables_in_scope(filename);
+        s->variables_in_scope = s->program->get_variables_in_scope(filename);
     }
 }
 }
