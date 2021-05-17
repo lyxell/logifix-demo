@@ -37,7 +37,7 @@ libprogram.so: program.o $(SQUARELOG_ARCHIVE)
 ImGuiFileDialog.o: ImGuiFileDialog/ImGuiFileDialog.cpp
 	$(CXX) $(CXXFLAGS) $< -c -o $@
 
-editor: main.o editor.o dockspace.o ast.o imedit/imedit.o ImGuiFileDialog.o $(IMGUI_BOILERPLATE_ARCHIVE)
+editor: main.o editor.o dockspace.o ast.o squarelog/repair.o squarelog/sjp/parser.o squarelog/sjp/lexer.o imedit/imedit.o ImGuiFileDialog.o $(IMGUI_BOILERPLATE_ARCHIVE)
 	$(CXX) -o $@ $^ $(LIBS)
 
 .PHONY: $(SQUARELOG_ARCHIVE) $(IMGUI_BOILERPLATE_ARCHIVE)

@@ -1,31 +1,32 @@
 #include "ast.h"
 #include "imgui.h"
 
-/*
-void ui::ast::render_node(sjp::ast& ast, sjp::ast_node node, size_t pos) {
+void ui::ast::render_node(logifix::repair* program, int node, size_t pos) {
     if (node == 0) {
         return;
     }
-    auto is_hovered = [&ast, pos](sjp::ast_node n) {
+    auto is_hovered = [program, pos](int n) {
         if (n == 0) {
             return false;
         }
-        return ast.starts_at[n] <= pos && ast.ends_at[n] >= pos;
+        auto [name, starts_at, ends_at] = program->get_node_properties(n);
+        return starts_at <= pos && ends_at >= pos;
     };
+    auto [name, starts_at, ends_at] = program->get_node_properties(node);
     if (is_hovered(node)) {
-        ImGui::Text("%s", ast.name[node].c_str());
+        ImGui::Text("%s", name.c_str());
         ImGui::Indent();
-        for (auto [symbol, child] : ast.parent_of[node]) {
+        for (auto [symbol, child] : program->get_children(node)) {
             auto Text = is_hovered(child) ? ImGui::Text : ImGui::TextDisabled;
             Text("%s:", symbol.c_str());
             ImGui::SameLine();
             if (child) {
-                render_node(ast, child, pos);
+                render_node(program, child, pos);
             } else {
                 Text("nil");
             }
         }
-        for (const auto& [symbol, children] : ast.parent_of_list[node]) {
+        for (const auto& [symbol, children] : program->get_child_lists(node)) {
             bool hover =
                 std::any_of(children.begin(), children.end(), is_hovered);
             auto Text = hover ? ImGui::Text : ImGui::TextDisabled;
@@ -39,7 +40,7 @@ void ui::ast::render_node(sjp::ast& ast, sjp::ast_node node, size_t pos) {
                 InnerText("[%d]", counter);
                 ImGui::Indent();
                 ImGui::SameLine();
-                render_node(ast, child, pos);
+                render_node(program, child, pos);
                 counter++;
             }
             if (children.empty()) {
@@ -50,16 +51,16 @@ void ui::ast::render_node(sjp::ast& ast, sjp::ast_node node, size_t pos) {
         }
         ImGui::Unindent();
     } else {
-        ImGui::TextDisabled("%s", ast.name[node].c_str());
+        ImGui::TextDisabled("%s", name.c_str());
     }
 }
 
 void ui::ast::render(const std::string& filename,
-                     sjp::ast& ast,
+                    logifix::repair* program,
                      size_t position) {
     ImGui::Begin((filename + " AST").c_str());
     ImGui::Text("%ld", position);
-    render_node(ast, ast.root, position);
+    render_node(program, program->get_root(), position);
     ImGui::End();
 }
-*/
+

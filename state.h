@@ -31,4 +31,5 @@ struct state {
     std::string text_input;
     bool dirty;
     std::mutex mutex;
+    std::unique_ptr<logifix::repair> program;
 };

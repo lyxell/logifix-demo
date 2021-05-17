@@ -32,11 +32,12 @@ int main() {
             s.inode = attr.st_ino;
             std::cout << "changed" << std::endl;
             if (handle) {
+                s.program = nullptr;
                 dlclose(handle);
                 handle = nullptr;
                 render_function = nullptr;
             }
-            handle = dlopen(libpath, RTLD_NOW);
+            handle = dlopen(libpath, RTLD_LAZY);
             if (handle == nullptr) {
                 std::cerr << "could not connect to libprogram: " << dlerror()
                           << std::endl;
@@ -72,9 +73,9 @@ int main() {
         buffer_position +=
             std::min(s.cursor.first, int(s.lines[s.cursor.second].size()));
 
-        {
-            //const std::lock_guard<std::mutex> lock(s.mutex);
-            //ui::ast::render("Test", s.ast, buffer_position);
+        if (s.program != nullptr) {
+            const std::lock_guard<std::mutex> lock(s.mutex);
+            ui::ast::render("Test", s.program.get(), buffer_position);
         }
 
         ImGui::Begin("Open file");
@@ -101,7 +102,6 @@ int main() {
         {
             const std::lock_guard<std::mutex> lock(s.mutex);
             ImGui::Begin("Variables in scope");
-            ImGui::Text("%ld", buffer_position);
             std::set<std::pair<std::string,std::string>> vars;
             for (auto [v, type, a, b] : s.variables_in_scope) {
                 if (a <= buffer_position && b >= buffer_position) {

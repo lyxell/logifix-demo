@@ -16,18 +16,19 @@ void run(state* s) {
         }
     }
 
-    logifix::repair rep;
+    s->program = std::make_unique<logifix::repair>();
     auto t1 = hclock::now();
     //rep.run();
-    rep.add_string(filename, data.c_str());
+    s->program->add_string(filename, data.c_str());
     auto t2 = hclock::now();
     std::cout << "Time difference:  "
               << std::chrono::duration_cast<std::chrono::milliseconds>(t2 - t1)
                      .count()
               << " milliseconds" << std::endl;
-    rep.run();
-    /*
-    auto repairs = rep.get_possible_repairs(filename);
+    s->program->run();
+
+
+    auto repairs = s->program->get_possible_repairs(filename);
     // temporary way to not include overlapping repairs
     decltype(repairs) filtered_repairs;
     for (size_t i = 0; i < repairs.size(); i++) {
@@ -45,11 +46,9 @@ void run(state* s) {
             filtered_repairs.emplace_back(ai, bi, ci, di);
         }
     }
-    auto ast = rep.get_ast(filename);
 
     {
         const std::lock_guard<std::mutex> lock(s->mutex);
-        s->ast = ast;
         if (filtered_repairs.size() == s->repairs.size()) {
             for (size_t i = 0; i < filtered_repairs.size(); i++) {
                 auto& [start, end, replacement, message] = filtered_repairs[i];
@@ -71,8 +70,7 @@ void run(state* s) {
                 s->repairs.push_back(r);
             }
         }
-        s->variables_in_scope = rep.get_variables_in_scope(filename);
+        //s->variables_in_scope = rep.get_variables_in_scope(filename);
     }
-    */
 }
 }
