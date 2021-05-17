@@ -101,6 +101,7 @@ int main() {
         {
             const std::lock_guard<std::mutex> lock(s.mutex);
             ImGui::Begin("Variables in scope");
+            ImGui::Text("%ld", buffer_position);
             std::set<std::pair<std::string,std::string>> vars;
             for (auto [v, type, a, b] : s.variables_in_scope) {
                 if (a <= buffer_position && b >= buffer_position) {
