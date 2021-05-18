@@ -37,7 +37,7 @@ libprogram.so: program.o $(LOGIFIX_ARCHIVE)
 ImGuiFileDialog.o: ImGuiFileDialog/ImGuiFileDialog.cpp
 	$(CXX) $(CXXFLAGS) $< -c -o $@
 
-editor: main.o editor.o dockspace.o ast.o logifix/repair.o logifix/sjp/parser.o logifix/sjp/lexer.o imedit/imedit.o ImGuiFileDialog.o $(IMGUI_BOILERPLATE_ARCHIVE)
+editor: main.o editor.o dockspace.o ast.o logifix/program.o logifix/sjp/parser.o logifix/sjp/lexer.o imedit/imedit.o ImGuiFileDialog.o $(IMGUI_BOILERPLATE_ARCHIVE)
 	$(CXX) -o $@ $^ $(LIBS)
 
 logifix/sjp/parser.o: $(LOGIFIX_ARCHIVE)

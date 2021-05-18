@@ -16,7 +16,7 @@ void run(state* s) {
         }
     }
 
-    s->program = std::make_unique<logifix::repair>();
+    s->program = std::make_unique<logifix::program>();
     auto t1 = hclock::now();
     //rep.run();
     s->program->add_string(filename, data.c_str());

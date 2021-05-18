@@ -1,7 +1,7 @@
 #include "ast.h"
 #include "imgui.h"
 
-void ui::ast::render_node(logifix::repair* program, int node, size_t pos) {
+void ui::ast::render_node(logifix::program* program, int node, size_t pos) {
     if (node == 0) {
         return;
     }
@@ -56,7 +56,7 @@ void ui::ast::render_node(logifix::repair* program, int node, size_t pos) {
 }
 
 void ui::ast::render(const std::string& filename,
-                    logifix::repair* program,
+                    logifix::program* program,
                      size_t position) {
     ImGui::Begin((filename + " AST").c_str());
     ImGui::Text("%ld", position);
