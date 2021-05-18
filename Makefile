@@ -1,5 +1,5 @@
 IMGUI_BOILERPLATE_ARCHIVE=imgui-boilerplate/imgui-boilerplate.a
-SQUARELOG_ARCHIVE=squarelog/logifix.a
+LOGIFIX_ARCHIVE=logifix/logifix.a
 
 LIBS = -lm -lpthread
 UNAME_S := $(shell uname -s)
@@ -31,24 +31,26 @@ endif
 
 all: editor libprogram.so
 
-libprogram.so: program.o $(SQUARELOG_ARCHIVE)
+libprogram.so: program.o $(LOGIFIX_ARCHIVE)
 	$(CXX) -o $@ -shared -Wl,--whole-archive $^ -Wl,--no-whole-archive
 
 ImGuiFileDialog.o: ImGuiFileDialog/ImGuiFileDialog.cpp
 	$(CXX) $(CXXFLAGS) $< -c -o $@
 
-editor: main.o editor.o dockspace.o ast.o squarelog/repair.o squarelog/sjp/parser.o squarelog/sjp/lexer.o imedit/imedit.o ImGuiFileDialog.o $(IMGUI_BOILERPLATE_ARCHIVE)
+editor: main.o editor.o dockspace.o ast.o logifix/repair.o logifix/sjp/parser.o logifix/sjp/lexer.o imedit/imedit.o ImGuiFileDialog.o $(IMGUI_BOILERPLATE_ARCHIVE)
 	$(CXX) -o $@ $^ $(LIBS)
 
-.PHONY: $(SQUARELOG_ARCHIVE) $(IMGUI_BOILERPLATE_ARCHIVE)
+logifix/sjp/parser.o: $(LOGIFIX_ARCHIVE)
+
+.PHONY: $(LOGIFIX_ARCHIVE) $(IMGUI_BOILERPLATE_ARCHIVE)
 
 $(IMGUI_BOILERPLATE_ARCHIVE):
 	$(MAKE) -C imgui-boilerplate
 
-$(SQUARELOG_ARCHIVE):
-	$(MAKE) -C squarelog
+$(LOGIFIX_ARCHIVE):
+	$(MAKE) -C logifix
 
 clean:
 	rm -rf *.o *.so editor
 	$(MAKE) -C imgui-boilerplate clean
-	$(MAKE) -C squarelog clean
+	$(MAKE) -C logifix clean

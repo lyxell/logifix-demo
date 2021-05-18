@@ -4,9 +4,9 @@
 [submodule "imedit"]
 	path = imedit
 	url = https://github.com/lyxell/imedit.git
-[submodule "squarelog"]
-	path = squarelog
-	url = https://github.com/lyxell/squarelog.git
 [submodule "ImGuiFileDialog"]
 	path = ImGuiFileDialog
 	url = https://github.com/aiekick/ImGuiFileDialog.git
+[submodule "logifix"]
+	path = logifix
+	url = https://github.com/lyxell/logifix.git

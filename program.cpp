@@ -1,4 +1,4 @@
-#include "squarelog/logifix.h"
+#include "logifix/logifix.h"
 #include "state.h"
 #include <iostream>
 
