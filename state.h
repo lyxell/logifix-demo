@@ -1,9 +1,10 @@
 #pragma once
 
-#include "ast.h"
+#include "logifix/logifix.h"
 #include <SDL.h>
 #include <mutex>
 #include <queue>
+#include <memory>
 #include <string>
 #include <sys/stat.h>
 #include <utility>
@@ -22,12 +23,12 @@ struct state {
 
     std::vector<std::string> lines;
     std::vector<repair> repairs;
-    std::vector<std::tuple<std::string, std::string, int, int>> variables_in_scope;
 
     ino_t inode;
     std::pair<int, int> cursor;
     bool show_demo_window;
     std::queue<SDL_Keysym> keyboard_input;
+    int hovered_node;
     std::string text_input;
     bool dirty;
     std::mutex mutex;

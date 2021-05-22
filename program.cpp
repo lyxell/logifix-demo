@@ -4,7 +4,6 @@
 
 extern "C" {
 void run(state* s) {
-    typedef std::chrono::high_resolution_clock hclock;
     const char* filename = "Example.java";
     std::string data;
 
@@ -17,20 +16,9 @@ void run(state* s) {
     }
 
     auto program = std::make_unique<logifix::program>();
-    auto t1 = hclock::now();
-    //rep.run();
     program->add_string(filename, data.c_str());
-    auto t2 = hclock::now();
-    std::cout << "Parsing took:  "
-              << std::chrono::duration_cast<std::chrono::milliseconds>(t2 - t1)
-                     .count()
-              << " milliseconds" << std::endl;
     program->run();
-    auto t3 = hclock::now();
-    std::cout << "Analysis took:  "
-              << std::chrono::duration_cast<std::chrono::milliseconds>(t3 - t2)
-                     .count()
-              << " milliseconds" << std::endl;
+    program->print();
 
     auto repairs = program->get_possible_rewrites(filename);
     // temporary way to not include overlapping repairs
@@ -74,7 +62,6 @@ void run(state* s) {
                 s->repairs.push_back(r);
             }
         }
-        s->variables_in_scope = program->get_variables_in_scope(filename);
         s->program = std::move(program);
     }
 }

@@ -1,7 +1,8 @@
 #include "dockspace.h"
+#include "filepicker.h"
+#include "ast.h"
 #include "editor.h"
 #include "imgui-boilerplate/window.h"
-#include "ImGuiFileDialog/ImGuiFileDialog.h"
 #include "imgui.h"
 #include "state.h"
 #include <dlfcn.h>
@@ -59,12 +60,8 @@ int main() {
         window::start_frame();
         s.keyboard_input = window::keyboard_input;
         s.text_input = window::text_input;
-        ui::dockspace::render();
-
-        {
-            const std::lock_guard<std::mutex> lock(s.mutex);
-            ui::editor::render(&s);
-        }
+        //ui::dockspace::render();
+        ui::filepicker::render(&s);
 
         size_t buffer_position = 0;
         for (int i = 0; i < s.cursor.second; i++) {
@@ -75,31 +72,26 @@ int main() {
 
         if (s.program != nullptr) {
             const std::lock_guard<std::mutex> lock(s.mutex);
-            ui::ast::render("Test", s.program.get(), buffer_position);
+            ui::ast::render(&s, buffer_position);
         }
 
-        ImGui::Begin("Open file");
-        if (ImGui::Button("Open File Dialog")) {
-            ImGuiFileDialog::Instance()->OpenDialog("ChooseFileDlgKey", "Choose File", ".java", ".");
-        }
-        if (ImGuiFileDialog::Instance()->Display("ChooseFileDlgKey")) {
-            if (ImGuiFileDialog::Instance()->IsOk()) {
-                std::string filePathName = ImGuiFileDialog::Instance()->GetFilePathName();
-                std::string filePath = ImGuiFileDialog::Instance()->GetCurrentPath();
-                std::cout << filePathName << std::endl;
-                std::ifstream infile(filePathName);
-                s.lines = {};
-                std::string line;
-                while (std::getline(infile, line)) {
-                    s.lines.emplace_back(line); 
-                }
-                s.dirty = true;
+        ImGui::Begin("Location info");
+        if (s.hovered_node && s.program) {
+            const std::lock_guard<std::mutex> lock(s.mutex);
+            auto [name, start, end] = s.program->get_node_properties(s.hovered_node);
+            ImGui::Text("Hovered node: %s %d %d", name.c_str(), start, end);
+            for (auto str : s.program->get_variables_in_scope(s.hovered_node)) {
+                ImGui::Text("%s", str.c_str());
             }
-            ImGuiFileDialog::Instance()->Close();
         }
         ImGui::End();
 
         {
+            const std::lock_guard<std::mutex> lock(s.mutex);
+            ui::editor::render(&s);
+        }
+
+        /*{
             const std::lock_guard<std::mutex> lock(s.mutex);
             ImGui::Begin("Variables in scope");
             std::set<std::pair<std::string,std::string>> vars;
@@ -122,7 +114,7 @@ int main() {
                 ImGui::EndTable();
             }
             ImGui::End();
-        }
+        }*/
 
         if (s.show_demo_window) {
             ImGui::ShowDemoWindow();

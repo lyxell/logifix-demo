@@ -189,6 +189,20 @@ void ui::editor::render(state* s) {
 
     size_t row = 1;
     size_t buffer_pos = 0;
+
+    int hover_start = 0;
+    int hover_end = 0;
+
+    int decl_start = 0;
+    int decl_end = 0;
+
+    if (s->program) {
+        hover_start = std::get<1>(s->program->get_node_properties(s->hovered_node));
+        hover_end = std::get<2>(s->program->get_node_properties(s->hovered_node));
+        decl_start = std::get<1>(s->program->get_node_properties(s->program->get_point_of_declaration(s->hovered_node)));
+        decl_end = std::get<2>(s->program->get_node_properties(s->program->get_point_of_declaration(s->hovered_node)));
+    }
+
     for (auto& line : s->lines) {
 
         bool cursor_in_intersection = false;
@@ -205,11 +219,26 @@ void ui::editor::render(state* s) {
             }
         }
 
+
+        auto hlis = find_intersection({hover_start, hover_end}, {buffer_pos, buffer_pos + line.size()});
+        if (hlis) {
+            ImEdit::Highlight(hlis->first - buffer_pos, hlis->second - buffer_pos, IM_COL32(240, 240, 240, 255));
+        }
+
+        auto hldecl = find_intersection({decl_start, decl_end}, {buffer_pos, buffer_pos + line.size()});
+        if (hldecl) {
+            ImEdit::Highlight(hldecl->first - buffer_pos, hldecl->second - buffer_pos, IM_COL32(240, 240, 180, 255));
+        }
+
         if (row == y + 1) {
             ImEdit::Cursor(std::min(x, (int) line.size()));
         }
 
-        ImEdit::Line(line.c_str());
+        auto pos = ImEdit::Line(line.c_str());
+
+        if (pos) {
+            s->cursor = *pos;
+        }
 
         for (auto& rep : s->repairs) {
             auto intersection = find_intersection(
