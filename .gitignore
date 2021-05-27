@@ -1,9 +1,2 @@
-.gdb_history
-*.o
-editor
-compile_commands.json
-*.csv
-*.so
-imgui.ini
+build
 *.class
-ImGuiFileDialog/*.o

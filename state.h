@@ -1,6 +1,6 @@
 #pragma once
 
-#include "logifix/logifix.h"
+#include "logifix.h"
 #include <SDL.h>
 #include <mutex>
 #include <queue>

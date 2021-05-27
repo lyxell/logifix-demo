@@ -1,4 +1,4 @@
-#include "logifix/logifix.h"
+#include "logifix.h"
 #include "state.h"
 #include <iostream>
 
